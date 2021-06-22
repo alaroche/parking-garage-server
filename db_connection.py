@@ -1,20 +1,34 @@
-import mysql.connector
+from getpass import getpass
+from mysql.connector import connect, Error
 
 class DbConnection:
-  CONFIG = {
-    'user': 'root',
-    'host': '127.0.0.1',
-    'database': 'parking_garage',
-  }
+  def __init__(self, query):
+    self.config = {
+      'user': 'root',
+      'host': '127.0.0.1',
+      'database': 'parking_garage',
+    }
+    self.query = query
 
-  def __init__(self):
-    self.cnx = mysql.connector.connect(self.CONFIG)
+  def run(query):
+    # TODO: cnx -> connection?
+    #self.cnx = mysql.connector.connect(CONFIG)
 
-  def query(query):
-    # TODO: testing
-    query = "SELECT * FROM parking_spots"
-    cursor = self.cnx.cursor(buffered=True)
+    #cursor = self.cnx.cursor(buffered=True)
+    
+    #result?
 
-    self.cnx.close()
+    try:
+      with connect(
+          user='root',
+          host='127.0.0.1',
+          database='parking_garage',
+      ) as connection:
+          with connection.cursor() as cursor:
+              cursor.execute(self.query)
+    except Error as e:
+        print(e)
+
+    #self.cnx.close()
     # TODO: return cursor result
-    return cursor
+    # return cursor
