@@ -30,34 +30,3 @@ LEFT JOIN parking_sessions
 ON parking_spots.id = parking_spot_sessions.parking_spot_id
 WHERE parking_spot_sessions.parking_spot_id IS NULL;
 */
-
--- park a bus
-        def park
-            // select:
-            //  first row where
-            //  available = true
-            //  
-            // select FIRST row where number of 'available' spots WITHIN 'accepted spot types' >= SPOT_USAGE_REQ
-            // fill spots (insert into where ^^)
-            // MySql.Connection("")
-
-            // find a row
-            // where there are 5 consecutive avaiable spots
-            possible_rows_to_park_in = ```
-            
-            ```
-
-            possible_rows_to_park_in.each do |row|
-
-            end
-
-            spot_ids = ```
-                SELECT id FROM spots
-                WHERE type = %{appropriate_spot_type}
-                AND available IS TRUE
-            ```
-            // GROUP BY spot row?
-            
-            ```
-            INSERT INTO vehicle_spots (spot_id, vehicle_id)
-            VALUES (%{spot_id}, %{id})
