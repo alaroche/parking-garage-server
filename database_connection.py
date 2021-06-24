@@ -1,6 +1,4 @@
-from getpass import getpass
 from mysql.connector import connect, Error
-import pdb
 
 class DatabaseConnection:
   def run(query):
@@ -11,11 +9,12 @@ class DatabaseConnection:
           password='rootroot',
           database='parking_garage',
       ) as connection:
-          print("has connection")
-          with connection.cursor() as cursor:
+          res = []
+          with connection.cursor(dictionary=True) as cursor:
               cursor.execute(query)
               for db in cursor:
-                print(db)
+                res.append(db)
+          return res
     except Error as e:
         print("Has error")
         print(e)

@@ -1,4 +1,3 @@
-import mysql.connector
 from app import parking_garage
 from database_connection import DatabaseConnection
 
