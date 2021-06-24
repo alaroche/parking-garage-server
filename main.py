@@ -1,6 +1,6 @@
 import mysql.connector
 from app import parking_garage
-from db_connection import DbConnection
+from database_connection import DatabaseConnection
 
 from typing import Optional
 
@@ -14,4 +14,4 @@ def read_root():
 
 @app.get("/parking_spots")
 def read_item():
-    return DbConnection.run("SELECT * FROM parking_spots")
+    return DatabaseConnection.run("SELECT * FROM parking_spots")
