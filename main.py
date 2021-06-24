@@ -13,7 +13,7 @@ def read_root():
 
 @app.get("/parking_spots")
 def read_item():
-    return DatabaseConnection.run("""
+    query = """
     SELECT 
         parking_spots.id, 
         parking_row_id, 
@@ -23,4 +23,6 @@ def read_item():
     LEFT JOIN parking_rows ON parking_spots.parking_row_id=parking_rows.id
     LEFT JOIN levels ON parking_rows.level_id=levels.id
     LEFT JOIN parking_spot_types on parking_spots.parking_spot_type_id=parking_spot_types.id;
-    """)
+    """
+
+    return DatabaseConnection.run(query)
