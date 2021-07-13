@@ -1,25 +1,30 @@
-#import app;
-import time;
+import src;
 import random;
-from datetime import datetime;
+import time;
+from datetime import datetime
 
-ACTIONS = ['park','leave','nothing']
+def around_business_hours():
+    now.time().hour > 8 and now.time().hour < 18;
 
-# every 30 seconds
-    # a car goes in
-        # is there enough room?
-    # a car leaves
-    # or nothing
+def get_vehicle():
+    # retrieve from db or, if around_business_hours(), get new one
+    random.choice(Motorcycle(),Car(),Bus());
 
 while True:
-    choice = random.choice(ACTIONS)
-    currentTime = datetime.now().strftime("%Y-%m-%d %I:%M %p") + " | ";
+    now = datetime.now();
+    nowStr = now.strftime("%Y-%m-%d %I:%M:%S %p") + " > ";
+
+    # TODO: weight
+    if around_business_hours():
+        choice = random.choice(['park','leave','nothing']);
+    else:
+        choice = random.choice(['leave','nothing']);
 
     if choice == 'park':
-        print(currentTime + "entering");
+        print(nowStr + "parking");
     elif choice == 'leave':
-        print(currentTime + "leaving");
+        print(nowStr + "leaving");
     else:
-        print(currentTime + "nothing to do");
+        print(nowStr + "nothing to do");
 
     time.sleep(30);

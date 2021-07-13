@@ -1,4 +1,3 @@
-from app import parking_garage
 from database_connection import DatabaseConnection
 
 from typing import Optional
