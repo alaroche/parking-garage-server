@@ -1,4 +1,4 @@
-from app.vehicle import *;
+from app import valet;
 import random;
 import time;
 from datetime import datetime
@@ -8,7 +8,10 @@ def around_business_hours():
 
 def get_vehicle():
     # retrieve from db or, if around_business_hours(), get new one
-    random.choice(Motorcycle(),Car(),Bus());
+    query = """
+    
+    """
+    random.choice(['motorcycle','car','bus']);
 
 while True:
     now = datetime.now();
@@ -22,6 +25,7 @@ while True:
 
     if choice == 'park':
         print(nowStr + "parking");
+        valet.park_vehicle('car');
     elif choice == 'leave':
         print(nowStr + "leaving");
     else:

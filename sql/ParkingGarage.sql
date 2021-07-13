@@ -14,7 +14,15 @@ CREATE TABLE parking_spot_types (
 CREATE TABLE vehicle_types (
 	id int NOT NULL AUTO_INCREMENT,
     name varchar(12),
+    spot_usage_requirement int(1),
     PRIMARY KEY(id)
+);
+
+CREATE TABLE vehicle_type_parking_spot_type_compatibilities (
+	vehicle_type_id int NOT NULL,
+    parking_spot_type_id int NOT NULL,
+    FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(id),
+    FOREIGN KEY (parking_spot_type_id) REFERENCES parking_spot_types(id)
 );
 
 -- Structural
@@ -55,10 +63,10 @@ CREATE TABLE vehicle_parking_sessions (
 CREATE TABLE parking_spot_sessions (
 	id int NOT NULL AUTO_INCREMENT,
     parking_spot_id int NOT NULL,
-    parking_session_Id int NOT NULL,
+    vehicle_parking_session_Id int NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (parking_spot_id) REFERENCES parking_spots(id),
-    FOREIGN KEY (parking_session_id) REFERENCES vehicle_parking_sessions(id)
+    FOREIGN KEY (vehicle_parking_session_id) REFERENCES vehicle_parking_sessions(id)
 );
 
 -- INSERT DATA
@@ -68,7 +76,12 @@ INSERT INTO levels (id,name) VALUES (1,'Red'),(2,'Orange'),(3,'Yellow'),(4,'Gree
 INSERT INTO parking_rows (level_id) VALUES (1),(1),(1),(1),(2),(2),(2),(2),(3),(3),(3),(3),(4),(4),(4),(4),(5),(5),(5),(5);
 
 INSERT INTO parking_spot_types (id,name) VALUES (1,'motorcycle'),(2,'compact'),(3,'large');
-INSERT INTO vehicle_types (id,name) VALUES (1,'motorocycle'),(2,'car'),(3,'bus');
+INSERT INTO vehicle_types (id,name,spot_usage_requirement) VALUES (1,'motorcycle',1),(2,'car',1),(3,'bus',5);
+
+INSERT INTO vehicle_type_parking_spot_type_compatibilities (vehicle_type_id, parking_spot_type_id)
+VALUES (1,1),(1,2),(1,3),
+(2,2),(2,3),
+(3,3);
 
 -- 12 spots in each row: 5 large, 5 compact, 2 motorcycle
 INSERT INTO parking_spots (parking_row_id,parking_spot_type_id)

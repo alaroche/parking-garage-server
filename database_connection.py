@@ -16,5 +16,21 @@ class DatabaseConnection:
                 res.append(db)
           return res
     except Error as e:
-        print("Has error")
+        print("Error getting record(s)")
+        print(e)
+
+  def insert(statement):
+    try:
+      with connect(
+          host='127.0.0.1',
+          user='root',
+          password='rootroot',
+          database='parking_garage',
+      ) as connection:
+          with connection.cursor(dictionary=True) as cursor:
+              cursor.execute(statement)
+              connection.commit();
+              return cursor.lastrowid;
+    except Error as e:
+        print("Error inserting record(s)")
         print(e)
