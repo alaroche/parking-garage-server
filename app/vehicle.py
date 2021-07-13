@@ -11,16 +11,16 @@ class Vehicle:
    #     a.detect { |st| st.count > 1 }
 
 class Motorcycle(Vehicle):
-    SUITABLE_SPOT_TYPES: ['motorcycle', 'compact', 'large']
-    SPOT_USAGE_REQ: 1
+    SUITABLE_SPOT_TYPES = ['motorcycle', 'compact', 'large']
+    SPOT_USAGE_REQ = 1
 
 class Car(Vehicle):
-    SUITABLE_SPOT_TYPES: ['compact', 'large']
-    SPOT_USAGE_REQ: 1
+    SUITABLE_SPOT_TYPES = ['compact', 'large']
+    SPOT_USAGE_REQ = 1
 
 class Bus(Vehicle):
-    SUITABLE_SPOT_TYPES: ['large']
-    SPOT_USAGE_REQ: 5
+    SUITABLE_SPOT_TYPES = ['large']
+    SPOT_USAGE_REQ = 5
 
     def appropriate_spot_type():
         "large"

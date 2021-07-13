@@ -1,4 +1,4 @@
-import src;
+from app.vehicle import *;
 import random;
 import time;
 from datetime import datetime
