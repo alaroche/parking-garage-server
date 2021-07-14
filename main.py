@@ -27,9 +27,9 @@ def read_item():
 def read_item():
     output = {}
     total_spots_taken = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NOT NULL")[0]['COUNT(*)']
-    total_spots_free = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NULL")[0]['COUNT(*)']
+    total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]['COUNT(*)']
     output["total_spots_taken"] = total_spots_taken
-    output["total_spots_free"] = total_spots_free
+    output["total_spots"] = total_spots
 
     levels = DatabaseConnection.run("SELECT * FROM levels")
     print(levels);
@@ -46,21 +46,20 @@ def read_item():
         """.format(level_id = level['id'])
         spots_taken_on_level = DatabaseConnection.run(spots_taken_on_level_sql)[0]['COUNT(*)']
 
-        spots_free_on_level_sql = """
+        total_spots_on_level_sql = """
         SELECT COUNT(*) FROM parking_spots
         INNER JOIN parking_rows
         ON parking_spots.parking_row_id = parking_rows.id
         INNER JOIN levels
         ON parking_rows.level_id = levels.id
-        WHERE parking_spots.current_parking_session_id IS NOT NULL
-        AND level_id = {level_id};
+        WHERE level_id = {level_id};
         """.format(level_id = level['id'])
-        spots_free_on_level = DatabaseConnection.run(spots_free_on_level_sql)[0]['COUNT(*)']
+        total_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]['COUNT(*)']
         level_key = "level_{level_id}".format(level_id = level['id'])
 
         output[level_key] = {}
         output[level_key]["spots_taken"] = spots_taken_on_level
-        output[level_key]["spots_free"] = spots_free_on_level
+        output[level_key]["total_spots"] = total_spots_on_level
 
     return output
 
