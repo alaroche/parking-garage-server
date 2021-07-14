@@ -41,28 +41,45 @@ def update_item(vehicle_type: str):
     vehicle_type_id = vehicle_type_res[0]['id'];
 
     parking_spots_query = """
-    SELECT parking_spots.id from parking_spots
-    LEFT JOIN parking_spot_sessions
-    ON parking_spots.id = parking_spot_sessions.parking_spot_id
-    WHERE parking_spot_sessions.vehicle_parking_session_id IS NULL
+    SELECT id from parking_spots
+    WHERE current_parking_session_id IS NULL
     LIMIT {vehicle_spot_usage_req};
     """.format(vehicle_spot_usage_req = vehicle_spot_usage_req);
 
     parking_spots = DatabaseConnection.run(parking_spots_query);
 
     vehicle_session_insert = """
-    INSERT INTO vehicle_parking_sessions (vehicle_type_id,parked_at)
+    INSERT INTO parking_sessions (vehicle_type_id,parked_at)
     VALUES({vehicle_type_id},CURRENT_TIMESTAMP);
     """.format(vehicle_type_id = vehicle_type_id);
     session_id = DatabaseConnection.insert(vehicle_session_insert);
 
+    # TODO: Use WHERE IN, not this loop
     for spot in parking_spots:
         spot_session_insert = """
-        INSERT INTO parking_spot_sessions (parking_spot_id,vehicle_parking_session_id)
-        VALUES({spot_id}, {session_id});
-        """.format(spot_id = spot['id'], session_id = session_id)
+        UPDATE parking_spots
+        SET current_parking_session_id = {session_id}
+        WHERE id = {spot_id};
+        """.format(session_id = session_id, spot_id = spot['id'])
+
         DatabaseConnection.insert(spot_session_insert);
 
-@app.delete("/park/{vehicle_parking_session_id}/leave")
-def remove_item(vehicle_parking_session_id: int):
-    DatabaseConnection.insert("DELETE FROM vehicle_parking_sessions WHERE id = {id}".format(id = vehicle_parking_session_id))
+@app.delete("/park/{session_id}/leave")
+def remove_item(session_id: int):
+    DatabaseConnection.insert("""
+    UPDATE parking_spots
+    SET current_parking_session_id = NULL
+    WHERE current_parking_session_id = {session_id}
+    """.format(session_id = session_id));
+
+    DatabaseConnection.insert("""
+    DELETE FROM parking_sessions
+    WHERE id = {session_id}
+    """.format(session_id = session_id));
+
+# TEST FUNCTIONS
+def unpark_random():
+    session_id_res = DatabaseConnection("SELECT id FROM parking_sessions ORDER BY RAND() LIMIT 1;")[0];
+    session_id = session_id_res[0]['id'];
+
+    remove_item(session_id)

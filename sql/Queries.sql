@@ -20,13 +20,3 @@ WHERE parking_sessions.left_at IS NULL;
 -- Leave
 DELETE FROM vehicle_spots
 WHERE vehicle_id = %{id}
-
-
- -- Query for free spots (wip)
-/*
-SELECT parking_spots.id as 'parking_spot_id'
-FROM parking_spots
-LEFT JOIN parking_sessions
-ON parking_spots.id = parking_spot_sessions.parking_spot_id
-WHERE parking_spot_sessions.parking_spot_id IS NULL;
-*/

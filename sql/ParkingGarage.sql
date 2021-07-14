@@ -40,18 +40,7 @@ CREATE TABLE parking_rows (
     FOREIGN KEY (level_id) REFERENCES levels(id)
 );
 
-CREATE TABLE parking_spots (
-	id int NOT NULL AUTO_INCREMENT,
-    parking_row_id int NOT NULL,
-    parking_spot_type_id int NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (parking_row_id) REFERENCES parking_rows(id),
-    FOREIGN KEY (parking_spot_type_id) REFERENCES parking_spot_types(id)
-);
-
--- Misc
-
-CREATE TABLE vehicle_parking_sessions (
+CREATE TABLE parking_sessions (
 	id int NOT NULL AUTO_INCREMENT,
     vehicle_type_id int NOT NULL,
     parked_at timestamp NOT NULL,
@@ -60,13 +49,15 @@ CREATE TABLE vehicle_parking_sessions (
     FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(id)
 );
 
-CREATE TABLE parking_spot_sessions (
+CREATE TABLE parking_spots (
 	id int NOT NULL AUTO_INCREMENT,
-    parking_spot_id int NOT NULL,
-    vehicle_parking_session_Id int NOT NULL,
+    parking_row_id int NOT NULL,
+    parking_spot_type_id int NOT NULL,
+    current_parking_session_id int,
     PRIMARY KEY (id),
-    FOREIGN KEY (parking_spot_id) REFERENCES parking_spots(id),
-    FOREIGN KEY (vehicle_parking_session_id) REFERENCES vehicle_parking_sessions(id)
+    FOREIGN KEY (parking_row_id) REFERENCES parking_rows(id),
+    FOREIGN KEY (parking_spot_type_id) REFERENCES parking_spot_types(id),
+    FOREIGN KEY (current_parking_session_id) REFERENCES parking_sessions(id)
 );
 
 -- INSERT DATA
@@ -106,5 +97,5 @@ VALUES (1,3),(1,3),(1,3),(1,3),(1,3),(1,2),(1,2),(1,2),(1,2),(1,2),(1,1),(1,1),
 (19,3),(19,3),(19,3),(19,3),(19,3),(19,2),(19,2),(19,2),(19,2),(19,2),(19,1),(19,1),
 (20,3),(20,3),(20,3),(20,3),(20,3),(20,2),(20,2),(20,2),(20,2),(20,2),(20,1),(20,1)
 
-#INSERT INTO vehicle_parking_sessions (vehicle_type_id, parked_at, left_at)
+#INSERT INTO parking_sessions (vehicle_type_id, parked_at, left_at)
 #VALUES (3,CURRENT_TIME(), NULL),

@@ -1,15 +1,10 @@
-from app import valet;
 import random;
 import time;
-import main;
+import requests;
 from datetime import datetime
 
 def around_business_hours():
     now.time().hour > 8 and now.time().hour < 18;
-
-def get_vehicle():
-    # retrieve from db or, if around_business_hours(), get new one
-    return random.choice(['motorcycle','car','bus']);
 
 while True:
     now = datetime.now();
@@ -23,9 +18,10 @@ while True:
 
     if choice == 'park':
         print(nowStr + "parking");
-        main.update_item(get_vehicle());
+        requests.put("http://127.0.0.1:8000/park/{vehicle_type}".format(vehicle_type = random.choice(['motorcycle','car','bus'])))
     elif choice == 'leave':
         print(nowStr + "leaving");
+        #main.unpark_random()
     else:
         print(nowStr + "nothing to do");
 
