@@ -58,6 +58,7 @@ def read_item():
         level_key = "level_{level_id}".format(level_id = level['id'])
 
         output[level_key] = {}
+        output[level_key]["name"] = level['name']
         output[level_key]["spots_taken"] = spots_taken_on_level
         output[level_key]["total_spots"] = total_spots_on_level
 

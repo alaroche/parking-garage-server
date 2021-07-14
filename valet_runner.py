@@ -15,11 +15,10 @@ while True:
     now = datetime.now();
     nowStr = now.strftime("%Y-%m-%d %I:%M:%S %p") + " > ";
 
-    # TODO: weight
-    #if around_business_hours():
-    choice = random.choice(['park','leave','relax']);
-    #else:
-        #choice = random.choice(['leave','relax']);
+    if around_business_hours():
+        choice = random.choice(['park','leave','relax']);
+    else:
+        choice = random.choice(['leave','relax']);
 
     if choice == 'park':
         print(nowStr + "parking");
