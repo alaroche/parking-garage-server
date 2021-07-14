@@ -23,6 +23,47 @@ def read_item():
 
     return DatabaseConnection.run(query)
 
+@app.get("/availability")
+def read_item():
+    output = {}
+    total_spots_taken = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NOT NULL")[0]['COUNT(*)']
+    total_spots_free = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NULL")[0]['COUNT(*)']
+    output["total_spots_taken"] = total_spots_taken
+    output["total_spots_free"] = total_spots_free
+
+    levels = DatabaseConnection.run("SELECT * FROM levels")
+    print(levels);
+
+    for level in levels:
+        spots_taken_on_level_sql = """
+        SELECT COUNT(*) FROM parking_spots
+        INNER JOIN parking_rows
+        ON parking_spots.parking_row_id = parking_rows.id
+        INNER JOIN levels
+        ON parking_rows.level_id = levels.id
+        WHERE parking_spots.current_parking_session_id IS NOT NULL
+        AND level_id = {level_id};
+        """.format(level_id = level['id'])
+        spots_taken_on_level = DatabaseConnection.run(spots_taken_on_level_sql)[0]['COUNT(*)']
+
+        spots_free_on_level_sql = """
+        SELECT COUNT(*) FROM parking_spots
+        INNER JOIN parking_rows
+        ON parking_spots.parking_row_id = parking_rows.id
+        INNER JOIN levels
+        ON parking_rows.level_id = levels.id
+        WHERE parking_spots.current_parking_session_id IS NOT NULL
+        AND level_id = {level_id};
+        """.format(level_id = level['id'])
+        spots_free_on_level = DatabaseConnection.run(spots_free_on_level_sql)[0]['COUNT(*)']
+        level_key = "level_{level_id}".format(level_id = level['id'])
+
+        output[level_key] = {}
+        output[level_key]["spots_taken"] = spots_taken_on_level
+        output[level_key]["spots_free"] = spots_free_on_level
+
+    return output
+
 # TODO: spot_usage_requirement? change name?
 @app.put("/park/{vehicle_type}")
 def update_item(vehicle_type: str):
@@ -59,16 +100,15 @@ def update_item(vehicle_type: str):
 
         DatabaseConnection.insert(spot_session_insert);
 
-@app.delete("/leave/{session_id}")
-def remove_item(session_id: int):
-    print(session_id);
+@app.delete("/sessions/{id}")
+def remove_item(id: int):
     DatabaseConnection.insert("""
     UPDATE parking_spots
     SET current_parking_session_id = NULL
-    WHERE current_parking_session_id = {session_id}
-    """.format(session_id = session_id));
+    WHERE current_parking_session_id = {id}
+    """.format(id = id));
 
     DatabaseConnection.insert("""
     DELETE FROM parking_sessions
     WHERE id = {session_id}
-    """.format(session_id = session_id));
+    """.format(id = id));

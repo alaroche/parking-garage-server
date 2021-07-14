@@ -17,17 +17,17 @@ while True:
 
     # TODO: weight
     #if around_business_hours():
-    choice = random.choice(['park','leave','nothing']);
+    choice = random.choice(['park','leave','relax']);
     #else:
-        #choice = random.choice(['leave','nothing']);
+        #choice = random.choice(['leave','relax']);
 
     if choice == 'park':
         print(nowStr + "parking");
         requests.put("http://127.0.0.1:8000/park/{vehicle_type}".format(vehicle_type = random.choice(['motorcycle','car','bus'])))
     elif choice == 'leave':
         print(nowStr + "leaving");
-        requests.delete("http://127.0.0.1:8000/leave/{session_id}".format(session_id = find_random_session_id()));
+        requests.delete("http://127.0.0.1:8000/sessions/{id}".format(id = find_random_session_id()));
     else:
-        print(nowStr + "nothing to do");
+        print(nowStr + "relaxing");
 
     time.sleep(10);
