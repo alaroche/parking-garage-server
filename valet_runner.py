@@ -5,7 +5,7 @@ from database_connection import DatabaseConnection
 from datetime import datetime;
 
 def around_business_hours():
-    now.time().hour > 8 and now.time().hour < 18;
+    return now.time().hour > 8 and now.time().hour < 18;
 
 def find_random_session_id():
     session_id_res = DatabaseConnection.run("SELECT id FROM parking_sessions ORDER BY RAND() LIMIT 1;");
