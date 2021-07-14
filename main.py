@@ -59,8 +59,9 @@ def update_item(vehicle_type: str):
 
         DatabaseConnection.insert(spot_session_insert);
 
-@app.delete("/park/{session_id}/leave")
+@app.delete("/leave/{session_id}")
 def remove_item(session_id: int):
+    print(session_id);
     DatabaseConnection.insert("""
     UPDATE parking_spots
     SET current_parking_session_id = NULL
@@ -71,10 +72,3 @@ def remove_item(session_id: int):
     DELETE FROM parking_sessions
     WHERE id = {session_id}
     """.format(session_id = session_id));
-
-# TEST FUNCTIONS
-def unpark_random():
-    session_id_res = DatabaseConnection("SELECT id FROM parking_sessions ORDER BY RAND() LIMIT 1;")[0];
-    session_id = session_id_res[0]['id'];
-
-    remove_item(session_id)
