@@ -30,11 +30,12 @@ def read_item():
     total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]['COUNT(*)']
     output["total_spots_taken"] = total_spots_taken
     output["total_spots"] = total_spots
+    output["levels"] = {}
 
     levels = DatabaseConnection.run("SELECT * FROM levels")
     print(levels);
 
-    for level in levels:
+    for idx, level in enumerate(levels):
         spots_taken_on_level_sql = """
         SELECT COUNT(*) FROM parking_spots
         INNER JOIN parking_rows
@@ -55,12 +56,11 @@ def read_item():
         WHERE level_id = {level_id};
         """.format(level_id = level['id'])
         total_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]['COUNT(*)']
-        level_key = "level_{level_id}".format(level_id = level['id'])
 
-        output[level_key] = {}
-        output[level_key]["name"] = level['name']
-        output[level_key]["spots_taken"] = spots_taken_on_level
-        output[level_key]["total_spots"] = total_spots_on_level
+        output["levels"][idx] = {}
+        output["levels"][idx]["name"] = level['name']
+        output["levels"][idx]["spots_taken"] = spots_taken_on_level
+        output["levels"][idx]["total_spots"] = total_spots_on_level
 
     return output
 
