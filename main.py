@@ -1,5 +1,5 @@
 from database_connection import DatabaseConnection
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 
@@ -83,21 +83,24 @@ def update_item(vehicle_type: str):
 
     parking_spots = DatabaseConnection.run(parking_spots_query)
 
-    vehicle_session_insert = """
-    INSERT INTO parking_sessions (vehicle_type_id,parked_at)
-    VALUES({vehicle_type_id},CURRENT_TIMESTAMP)
-    """.format(vehicle_type_id = vehicle_type_id)
-    session_id = DatabaseConnection.insert(vehicle_session_insert)
+    if bool(parking_spots):
+        vehicle_session_insert = """
+        INSERT INTO parking_sessions (vehicle_type_id,parked_at)
+        VALUES({vehicle_type_id},CURRENT_TIMESTAMP)
+        """.format(vehicle_type_id = vehicle_type_id)
+        session_id = DatabaseConnection.insert(vehicle_session_insert)
 
-    # TODO: Use WHERE IN, not this loop
-    for spot in parking_spots:
-        spot_session_insert = """
-        UPDATE parking_spots
-        SET current_parking_session_id = {session_id}
-        WHERE id = {spot_id}
-        """.format(session_id = session_id, spot_id = spot["id"])
+        # TODO: Use WHERE IN, not this loop
+        for spot in parking_spots:
+            spot_session_insert = """
+            UPDATE parking_spots
+            SET current_parking_session_id = {session_id}
+            WHERE id = {spot_id}
+            """.format(session_id = session_id, spot_id = spot["id"])
 
-        DatabaseConnection.insert(spot_session_insert)
+            DatabaseConnection.insert(spot_session_insert)
+    else:
+        raise HTTPException(status_code=503, detail="Lot Full")
 
 @app.delete("/sessions/{id}")
 def remove_item(id: int):
