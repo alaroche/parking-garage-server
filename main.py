@@ -13,8 +13,8 @@ def read_item():
     SELECT 
         parking_spots.id, 
         parking_row_id, 
-        parking_spot_types.name as 'kind', 
-        levels.name as 'level_name'
+        parking_spot_types.name as "kind",
+        levels.name as "level_name"
     FROM parking_spots
     LEFT JOIN parking_rows ON parking_spots.parking_row_id=parking_rows.id
     LEFT JOIN levels ON parking_rows.level_id=levels.id
@@ -26,26 +26,25 @@ def read_item():
 @app.get("/availability")
 def read_item():
     output = {}
-    total_spots_taken = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NOT NULL")[0]['COUNT(*)']
-    total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]['COUNT(*)']
-    output["total_spots_taken"] = total_spots_taken
+    total_spots_free = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NULL")[0]["COUNT(*)"]
+    total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]["COUNT(*)"]
+    output["total_spots_free"] = total_spots_free
     output["total_spots"] = total_spots
     output["levels"] = {}
 
     levels = DatabaseConnection.run("SELECT * FROM levels")
-    print(levels);
 
     for idx, level in enumerate(levels):
-        spots_taken_on_level_sql = """
+        spots_free_on_level_sql = """
         SELECT COUNT(*) FROM parking_spots
         INNER JOIN parking_rows
         ON parking_spots.parking_row_id = parking_rows.id
         INNER JOIN levels
         ON parking_rows.level_id = levels.id
-        WHERE parking_spots.current_parking_session_id IS NOT NULL
+        WHERE parking_spots.current_parking_session_id IS NULL
         AND level_id = {level_id};
-        """.format(level_id = level['id'])
-        spots_taken_on_level = DatabaseConnection.run(spots_taken_on_level_sql)[0]['COUNT(*)']
+        """.format(level_id = level["id"])
+        spots_free_on_level = DatabaseConnection.run(spots_free_on_level_sql)[0]["COUNT(*)"]
 
         total_spots_on_level_sql = """
         SELECT COUNT(*) FROM parking_spots
@@ -54,12 +53,12 @@ def read_item():
         INNER JOIN levels
         ON parking_rows.level_id = levels.id
         WHERE level_id = {level_id};
-        """.format(level_id = level['id'])
-        total_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]['COUNT(*)']
+        """.format(level_id = level["id"])
+        total_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]["COUNT(*)"]
 
         output["levels"][idx] = {}
-        output["levels"][idx]["name"] = level['name']
-        output["levels"][idx]["spots_taken"] = spots_taken_on_level
+        output["levels"][idx]["name"] = level["name"]
+        output["levels"][idx]["spots_free"] = spots_free_on_level
         output["levels"][idx]["total_spots"] = total_spots_on_level
 
     return output
@@ -68,13 +67,13 @@ def read_item():
 @app.put("/park/{vehicle_type}")
 def update_item(vehicle_type: str):
     vehicle_type_query = """
-    SELECT id, spot_usage_requirement FROM vehicle_types WHERE name = '{vehicle_type}'
+    SELECT id, spot_usage_requirement FROM vehicle_types WHERE name = "{vehicle_type}"
     """ .format(vehicle_type=vehicle_type);
 
     vehicle_type_res = DatabaseConnection.run(vehicle_type_query);
 
-    vehicle_spot_usage_req = vehicle_type_res[0]['spot_usage_requirement'];
-    vehicle_type_id = vehicle_type_res[0]['id'];
+    vehicle_spot_usage_req = vehicle_type_res[0]["spot_usage_requirement"];
+    vehicle_type_id = vehicle_type_res[0]["id"];
 
     parking_spots_query = """
     SELECT id from parking_spots
@@ -96,7 +95,7 @@ def update_item(vehicle_type: str):
         UPDATE parking_spots
         SET current_parking_session_id = {session_id}
         WHERE id = {spot_id};
-        """.format(session_id = session_id, spot_id = spot['id'])
+        """.format(session_id = session_id, spot_id = spot["id"])
 
         DatabaseConnection.insert(spot_session_insert);
 
