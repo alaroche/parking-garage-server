@@ -62,3 +62,7 @@ def update_item(vehicle_type: str):
         VALUES({spot_id}, {session_id});
         """.format(spot_id = spot['id'], session_id = session_id)
         DatabaseConnection.insert(spot_session_insert);
+
+@app.delete("/park/{vehicle_parking_session_id}/leave")
+def remove_item(vehicle_parking_session_id: int):
+    DatabaseConnection.insert("DELETE FROM vehicle_parking_sessions WHERE id = {id}".format(id = vehicle_parking_session_id))
