@@ -29,8 +29,8 @@ class DatabaseConnection:
       ) as connection:
           with connection.cursor(dictionary=True) as cursor:
               cursor.execute(statement)
-              connection.commit();
-              return cursor.lastrowid;
+              connection.commit()
+              return cursor.lastrowid
     except Error as e:
         print("Error inserting record(s)")
         print(e)
