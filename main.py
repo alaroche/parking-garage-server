@@ -1,9 +1,4 @@
-from mysql.connector.connection import MySQLConnection
 from database_connection import DatabaseConnection
-from datetime import datetime
-
-from typing import Optional
-
 from fastapi import FastAPI
 
 app = FastAPI()

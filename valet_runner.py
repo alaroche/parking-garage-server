@@ -1,7 +1,7 @@
 import random;
 import time;
 import requests;
-from datetime import datetime
+from datetime import datetime;
 
 def around_business_hours():
     now.time().hour > 8 and now.time().hour < 18;
