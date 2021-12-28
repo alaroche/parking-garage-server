@@ -1,7 +1,13 @@
 from database_connection import DatabaseConnection
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+)
 
 @app.get("/")
 def read_root():
