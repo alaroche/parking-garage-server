@@ -1,4 +1,4 @@
-DROP DATABASE parking_garage;
+DROP DATABASE IF EXISTS parking_garage;
 CREATE DATABASE parking_garage;
 
 USE parking_garage;
