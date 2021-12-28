@@ -81,13 +81,7 @@ def update_item(vehicle_type: str):
     vehicle_spot_usage_req = vehicle_type_res[0]["spot_usage_requirement"]
     vehicle_type_id = vehicle_type_res[0]["id"]
 
-    parking_spots_query = """
-    SELECT id from parking_spots
-    WHERE current_parking_session_id IS NULL
-    LIMIT {vehicle_spot_usage_req}
-    """.format(vehicle_spot_usage_req = vehicle_spot_usage_req)
-
-    parking_spots = DatabaseConnection.run(parking_spots_query)
+    parking_spots = find_parking_spots(vehicle_spot_usage_req, vehicle_type_id);
 
     if bool(parking_spots):
         vehicle_session_insert = """
@@ -120,3 +114,20 @@ def remove_item(id: int):
     DELETE FROM parking_sessions
     WHERE id = {id}
     """.format(id = id))
+
+def find_parking_spots(vehicle_spot_usage_req, vehicle_type_id):
+    parking_spots_query = """
+    SELECT id, parking_row_id from parking_spots
+    WHERE current_parking_session_id IS NULL
+    ORDER BY parking_row_id
+    LIMIT {vehicle_spot_usage_req}
+    """.format(vehicle_spot_usage_req = vehicle_spot_usage_req)
+
+    free_spots = DatabaseConnection.run(parking_spots_query)
+    print(free_spots)
+
+    # TODO: Park a bus
+    #for free_spot in free_spots:
+    #modulus?
+
+    return free_spots

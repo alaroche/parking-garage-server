@@ -19,7 +19,7 @@ while True:
     nowStr = now.strftime("%Y-%m-%d %I:%M:%S %p") + " > "
 
     if around_business_hours():
-        choice = random.choice(['park','leave','relax','park'])
+        choice = random.choice(['park','leave','relax'])
     else:
         choice = random.choice(['leave','relax'])
 
