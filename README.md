@@ -9,8 +9,12 @@ Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-cl
 
 ## Setup
 ### MySQL
-* Create user named `parking_garage_user` with `pg_sql123` as a pass.
-* Run setup script to (re-)create database and pre-populate tables: https://github.com/alaroche/parking-garage-server/blob/main/sql/ParkingGarage.sql.
+* Run setup script in SQL which (re-)creates the database and pre-populates tables with sample data: https://github.com/alaroche/parking-garage-server/blob/main/sql/ParkingGarage.sql.
+* Create a user for interaction with the new database:
+```
+CREATE USER 'parking_garage_user'@'localhost' IDENTIFIED BY 'pg_sql123';
+GRANT ALL PRIVILEGES ON parking_garage.* TO 'parking_garage_user'@'localhost';
+```
 
 ## Run
 ### Start Server
@@ -18,7 +22,7 @@ From `parking-garage-server/` directory:
 ```
 uvicorn main:app --reload
 ```
-Limited FastAPI interface should become viewable locally.
+FastAPI interface should come up locally.
 
 ### Optional
 Start the Valet Runner to simulate timestamped activity
