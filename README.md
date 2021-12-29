@@ -1,41 +1,39 @@
+# README
+Parking Garage Server is a back-end API interface for a MySQL Server.  The intent is for demonstration purposes only.
+
+Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-client).
+
 ## Requirements
-parking-garage-client: https://github.com/alaroche/parking-garage-client
+* [MySQL 8.0.24](https://dev.mysql.com/doc/refman/8.0/en/)
+* [Python 3](https://www.python.org/downloads/)
 
-## Getting Started
+## Setup
+### MySQL
+* Create user named `root` with `rootroot` as a pass.
+* Run setup script to (re-)create database and pre-populate tables: https://github.com/alaroche/parking-garage-server/blob/main/sql/ParkingGarage.sql.
 
-### Setup
-mysql database
-setup scripts
-
-### How to Play
-
-### * Start Client
-From `parking-garage-client/` directory:
-```
-yarn start
-```
-
-### * Start Server and Runner
+## Run
+### Start Server
 From `parking-garage-server/` directory:
 ```
 uvicorn main:app --reload
+```
+
+### Optional
+Start the Valet Runner to simulate timestamped activity
+```
 python3 valet_runner.py
 ```
 
-## About the App
+---
+## About the Complete App
 
 ### [Parking Garage Server](https://github.com/alaroche/parking-garage-server)
-Back-end architecture written in [Python3](https://www.python.org/)
-Runs on [Uvicorn](https://www.uvicorn.org/)
-Intereacts with [MySQL Community Server - GPL 8.0.24](https://dev.mysql.com/)
-(fastapi?)
-
-#### Components
-Public API
-
-#### Valet Runner
-Feeds data to the MySQL Server.
+* Back-end API written in [Python3](https://www.python.org/)
+* Server runs on [Uvicorn](https://www.uvicorn.org/)
+* Interacts with [MySQL 8.0.24](https://dev.mysql.com/doc/refman/8.0/en/)
+* Valet Runner test script simulates timestamped activity
 
 ### [Parking Garage Client](https://github.com/alaroche/parking-garage-client)
-Front-End interface bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
-Runs with [Yarn](https://classic.yarnpkg.com/)
+* Front-End interface bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
+* Builds and runs on [Yarn](https://classic.yarnpkg.com/)
