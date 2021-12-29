@@ -1,4 +1,4 @@
-# README
+# Parking Garage Server
 Parking Garage Server is a back-end API interface for a MySQL Server.  The intent is for demonstration purposes only.
 
 Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-client).
@@ -9,7 +9,7 @@ Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-cl
 
 ## Setup
 ### MySQL
-* Create user named `root` with `rootroot` as a pass.
+* Create user named `parking_garage_user` with `pg_sql123` as a pass.
 * Run setup script to (re-)create database and pre-populate tables: https://github.com/alaroche/parking-garage-server/blob/main/sql/ParkingGarage.sql.
 
 ## Run
@@ -18,6 +18,7 @@ From `parking-garage-server/` directory:
 ```
 uvicorn main:app --reload
 ```
+Limited FastAPI interface should become viewable locally.
 
 ### Optional
 Start the Valet Runner to simulate timestamped activity
