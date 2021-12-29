@@ -81,7 +81,10 @@ def update_item(vehicle_type: str):
     vehicle_spot_usage_req = vehicle_type_res[0]["spot_usage_requirement"]
     vehicle_type_id = vehicle_type_res[0]["id"]
 
-    parking_spots = find_parking_spots(vehicle_spot_usage_req, vehicle_type_id);
+    if vehicle_type != 'bus':
+        parking_spots = find_parking_spot(vehicle_spot_usage_req);
+    else:
+        parking_spots = find_parking_spots_for_bus();
 
     if bool(parking_spots):
         vehicle_session_insert = """
@@ -115,7 +118,7 @@ def remove_item(id: int):
     WHERE id = {id}
     """.format(id = id))
 
-def find_parking_spots(vehicle_spot_usage_req, vehicle_type_id):
+def find_parking_spot(vehicle_spot_usage_req):
     parking_spots_query = """
     SELECT id, parking_row_id from parking_spots
     WHERE current_parking_session_id IS NULL
@@ -124,10 +127,27 @@ def find_parking_spots(vehicle_spot_usage_req, vehicle_type_id):
     """.format(vehicle_spot_usage_req = vehicle_spot_usage_req)
 
     free_spots = DatabaseConnection.run(parking_spots_query)
-    print(free_spots)
-
-    # TODO: Park a bus
-    #for free_spot in free_spots:
-    #modulus?
 
     return free_spots
+
+def find_parking_spots_for_bus():
+    parking_spots_query = """
+    SELECT id, parking_row_id from parking_spots
+    WHERE current_parking_session_id IS NULL
+    ORDER BY parking_row_id
+    """
+
+    free_spots = DatabaseConnection.run(parking_spots_query)
+    required_number_of_spots_needed = 4
+
+    suitable_spots = []
+    prev_row_id = 1
+    for spot in free_spots:
+        row_id = spot['parking_row_id']
+        if (len(suitable_spots) < required_number_of_spots_needed) and (row_id == prev_row_id):
+            suitable_spots.append(spot)
+        else:
+            prev_row_id = row_id;
+            break
+
+    return suitable_spots
