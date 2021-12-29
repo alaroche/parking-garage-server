@@ -5,8 +5,8 @@ class DatabaseConnection:
     try:
       with connect(
           host='127.0.0.1',
-          user='root',
-          password='rootroot',
+          user='parking_garage_user',
+          password='pg_sql123',
           database='parking_garage',
       ) as connection:
           res = []
@@ -23,8 +23,8 @@ class DatabaseConnection:
     try:
       with connect(
           host='127.0.0.1',
-          user='root',
-          password='rootroot',
+          user='parking_garage_user',
+          password='pg_sql123',
           database='parking_garage',
       ) as connection:
           with connection.cursor(dictionary=True) as cursor:
