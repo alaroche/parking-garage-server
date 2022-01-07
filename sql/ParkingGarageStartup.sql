@@ -62,7 +62,7 @@ CREATE TABLE parking_spots (
 
 -- INSERT DATA
 
-INSERT INTO levels (id,name) VALUES (1,'Red'),(2,'Orange'),(3,'Yellow'),(4,'Green'),(5,'Blue');
+INSERT INTO levels (id,name) VALUES (1,'Gamma'),(2,'Theta'),(3,'Kappa'),(4,'Lambda'),(5,'Upsilon');
 
 INSERT INTO parking_rows (level_id) VALUES (1),(1),(1),(1),(2),(2),(2),(2),(3),(3),(3),(3),(4),(4),(4),(4),(5),(5),(5),(5);
 
