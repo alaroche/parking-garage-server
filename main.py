@@ -9,145 +9,116 @@ app.add_middleware(
     allow_origins=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
+# TODO: double to single quotes
+# TODO: document the end points
+# and add them to the README
 @app.get("/parking_spots")
 def read_item():
-    query = """
+    parking_spots_sql = """
     SELECT 
         parking_spots.id, 
         parking_row_id, 
-        parking_spot_types.name as "kind",
-        levels.name as "level_name"
+        parking_levels.name as "level_name"
     FROM parking_spots
     LEFT JOIN parking_rows ON parking_spots.parking_row_id=parking_rows.id
-    LEFT JOIN levels ON parking_rows.level_id=levels.id
-    LEFT JOIN parking_spot_types on parking_spots.parking_spot_type_id=parking_spot_types.id
+    LEFT JOIN parking_levels ON parking_rows.level_id=parking_levels.id
     """
 
-    return DatabaseConnection.run(query)
+    return DatabaseConnection.run(parking_spots_sql)
 
 @app.get("/availability")
 def read_item():
     output = {}
-    total_spots_free = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots WHERE current_parking_session_id IS NULL")[0]["COUNT(*)"]
-    total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]["COUNT(*)"]
-    output["total_spots_free"] = total_spots_free
-    output["total_spots"] = total_spots
-    output["levels"] = {}
+    num_of_total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]['COUNT(*)']
+    num_of_filled_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_sessions WHERE stopped_at IS NULL")[0]['COUNT(*)']
+    num_of_free_spots = num_of_total_spots - num_of_filled_spots
 
-    levels = DatabaseConnection.run("SELECT * FROM levels")
+    output["total_spots_free"] = num_of_free_spots
+    output["total_spots"] = num_of_total_spots
+    output["parking_levels"] = {}
 
-    for idx, level in enumerate(levels):
-        spots_free_on_level_sql = """
-        SELECT COUNT(*) FROM parking_spots
-        INNER JOIN parking_rows
-        ON parking_spots.parking_row_id = parking_rows.id
-        INNER JOIN levels
-        ON parking_rows.level_id = levels.id
-        WHERE parking_spots.current_parking_session_id IS NULL
-        AND level_id = {level_id}
-        """.format(level_id = level["id"])
-        spots_free_on_level = DatabaseConnection.run(spots_free_on_level_sql)[0]["COUNT(*)"]
+    parking_levels = DatabaseConnection.run("SELECT * FROM parking_levels")
 
+    for idx, parking_level in enumerate(parking_levels):
         total_spots_on_level_sql = """
         SELECT COUNT(*) FROM parking_spots
         INNER JOIN parking_rows
         ON parking_spots.parking_row_id = parking_rows.id
-        INNER JOIN levels
-        ON parking_rows.level_id = levels.id
-        WHERE level_id = {level_id}
-        """.format(level_id = level["id"])
-        total_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]["COUNT(*)"]
+        INNER JOIN parking_levels
+        ON parking_rows.parking_level_id = parking_levels.id
+        WHERE parking_level_id = {level_id}
+        """.format(level_id = parking_level["id"])
+        num_of_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]["COUNT(*)"]
 
-        output["levels"][idx] = {}
-        output["levels"][idx]["name"] = level["name"]
-        output["levels"][idx]["spots_free"] = spots_free_on_level
-        output["levels"][idx]["total_spots"] = total_spots_on_level
+        num_of_filled_spots_on_level_sql = """
+        SELECT COUNT(*) from parking_spots
+        INNER JOIN parking_rows
+        ON parking_spots.parking_row_id = parking_rows.id
+        INNER JOIN parking_levels
+        ON parking_rows.parking_level_id = parking_levels.id
+        INNER JOIN parking_sessions
+        ON parking_sessions.parking_spot_id = parking_spots.id
+        WHERE parking_sessions.stopped_at IS NULL
+        AND parking_level_id = {level_id}
+        """.format(level_id = parking_level['id'])
+        num_of_spots_filled_on_level = DatabaseConnection.run(num_of_filled_spots_on_level_sql)[0]["COUNT(*)"]
+        num_of_spots_free_on_level = num_of_spots_on_level - num_of_spots_filled_on_level
+
+        output["parking_levels"][idx] = {}
+        output["parking_levels"][idx]["name"] = parking_level["name"]
+        output["parking_levels"][idx]["spots_free"] = num_of_spots_free_on_level
+        output["parking_levels"][idx]["total_spots"] = num_of_spots_on_level
 
     return output
 
-# TODO: spot_usage_requirement? change name?
-@app.put("/park/{vehicle_type}")
-def update_item(vehicle_type: str):
-    vehicle_type_query = """
-    SELECT id, spot_usage_requirement FROM vehicle_types WHERE name = "{vehicle_type}"
-    """ .format(vehicle_type=vehicle_type)
+@app.post("/park")
+def update_item():
+    spot_id = find_parking_spot();
 
-    vehicle_type_res = DatabaseConnection.run(vehicle_type_query)
-
-    vehicle_spot_usage_req = vehicle_type_res[0]["spot_usage_requirement"]
-    vehicle_type_id = vehicle_type_res[0]["id"]
-
-    if vehicle_type != 'bus':
-        parking_spots = find_parking_spot(vehicle_spot_usage_req);
-    else:
-        parking_spots = find_parking_spots_for_bus();
-
-    if bool(parking_spots):
+    if bool(spot_id):
         vehicle_session_insert = """
-        INSERT INTO parking_sessions (vehicle_type_id,parked_at)
-        VALUES({vehicle_type_id},CURRENT_TIMESTAMP)
-        """.format(vehicle_type_id = vehicle_type_id)
-        session_id = DatabaseConnection.insert(vehicle_session_insert)
+        INSERT INTO parking_sessions (parking_spot_id, started_at)
+        VALUES({spot_id}, CURRENT_TIMESTAMP)
+        """.format(spot_id = spot_id)
 
-        # TODO: Use WHERE IN, not this loop
-        for spot in parking_spots:
-            spot_session_insert = """
-            UPDATE parking_spots
-            SET current_parking_session_id = {session_id}
-            WHERE id = {spot_id}
-            """.format(session_id = session_id, spot_id = spot["id"])
-
-            DatabaseConnection.insert(spot_session_insert)
+        DatabaseConnection.insert(vehicle_session_insert)
     else:
-        raise HTTPException(status_code=503, detail="Lot Full")
+        raise HTTPException(status_code=403, detail="No parking spots are available.")
 
-@app.delete("/sessions/{id}")
-def remove_item(id: int):
-    DatabaseConnection.insert("""
-    UPDATE parking_spots
-    SET current_parking_session_id = NULL
-    WHERE current_parking_session_id = {id}
-    """.format(id = id))
-
-    DatabaseConnection.insert("""
-    DELETE FROM parking_sessions
+@app.put("/unpark/{session_id}")
+def unpark_vehicle(session_id: int):
+    close_parking_session = """
+    UPDATE parking_sessions
+    SET stopped_at = CURRENT_TIMESTAMP
     WHERE id = {id}
-    """.format(id = id))
+    """.format(id = session_id)
 
-def find_parking_spot(vehicle_spot_usage_req):
-    parking_spots_query = """
-    SELECT id, parking_row_id from parking_spots
-    WHERE current_parking_session_id IS NULL
-    ORDER BY parking_row_id
-    LIMIT {vehicle_spot_usage_req}
-    """.format(vehicle_spot_usage_req = vehicle_spot_usage_req)
+    DatabaseConnection.insert(close_parking_session);
 
-    free_spots = DatabaseConnection.run(parking_spots_query)
-
-    return free_spots
-
-def find_parking_spots_for_bus():
-    parking_spots_query = """
-    SELECT id, parking_row_id from parking_spots
-    WHERE current_parking_session_id IS NULL
-    ORDER BY parking_row_id
+# TODO: external file
+def find_parking_spot():
+    taken_spots_query = """
+    SELECT parking_spot_id
+    FROM parking_sessions
+    WHERE stopped_at IS NULL
     """
 
-    free_spots = DatabaseConnection.run(parking_spots_query)
-    required_number_of_spots_needed = 4
+    taken_spots_result = DatabaseConnection.run(taken_spots_query)
 
-    suitable_spots = []
-    prev_row_id = 1
-    for spot in free_spots:
-        row_id = spot['parking_row_id']
-        if (len(suitable_spots) < required_number_of_spots_needed) and (row_id == prev_row_id):
-            suitable_spots.append(spot)
-        else:
-            prev_row_id = row_id;
-            break
+    taken_spot_ids = [0,0]
+    for obj in taken_spots_result:
+        taken_spot_ids.append(obj['parking_spot_id']);
 
-    return suitable_spots
+    parking_spots_query = """
+    SELECT id FROM parking_spots
+    WHERE id NOT IN {}
+    ORDER BY id
+    LIMIT 1;
+    """.format(tuple(taken_spot_ids));
+
+    free_spot = DatabaseConnection.run(parking_spots_query)
+
+    if free_spot:
+        return free_spot[0]['id']
+    else:
+        return []

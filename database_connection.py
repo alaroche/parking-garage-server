@@ -1,4 +1,7 @@
-from mysql.connector import connect, Error
+from mysql.connector import connect
+from fastapi.exceptions import HTTPException
+
+HTTP_INTERNAL_SERVER_ERROR_CODE = 500
 
 class DatabaseConnection:
   def run(query):
@@ -15,9 +18,8 @@ class DatabaseConnection:
               for db in cursor:
                 res.append(db)
           return res
-    except Error as e:
-        print("Error getting record(s)")
-        print(e)
+    except:
+      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE) 
 
   def insert(statement):
     try:
@@ -31,6 +33,5 @@ class DatabaseConnection:
               cursor.execute(statement)
               connection.commit()
               return cursor.lastrowid
-    except Error as e:
-        print("Error inserting record(s)")
-        print(e)
+    except:
+      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE) 

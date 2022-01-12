@@ -25,12 +25,12 @@ while True:
 
     if choice == 'park':
         print(nowStr + "parking")
-        requests.put("http://127.0.0.1:8000/park/{vehicle_type}".format(vehicle_type = random.choice(['motorcycle','car','bus'])))
+        requests.post("http://127.0.0.1:8000/park")
     elif choice == 'leave':
         print(nowStr + "leaving")
         session_id = find_random_session_id()
         if (session_id):
-            requests.delete("http://127.0.0.1:8000/sessions/{id}".format(id = session_id))
+            requests.put("http://127.0.0.1:8000/unpark/{id}".format(id = session_id))
     else:
         print(nowStr + "relaxing")
 
