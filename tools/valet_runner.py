@@ -1,7 +1,7 @@
 import random
 import time
 import requests
-from database_connection import DatabaseConnection
+from lib.database_connection import DatabaseConnection
 from datetime import datetime
 
 def around_business_hours():

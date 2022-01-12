@@ -10,7 +10,7 @@ Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-cl
 
 ## Setup
 ### MySQL
-* Run setup script in SQL which (re-)creates the database and pre-populates tables with sample data: https://github.com/alaroche/parking-garage-server/blob/main/sql/ParkingGarageStartup.sql.
+* Run setup script in SQL which (re-)creates the database and pre-populates tables with sample data: https://github.com/alaroche/parking-garage-server/blob/main/tools/ParkingGarageStartup.sql.
 * Create a user for interaction with the new database:
 ```
 CREATE USER 'parking_garage_user'@'localhost' IDENTIFIED BY 'pg_sql123';

@@ -1,4 +1,4 @@
-from database_connection import DatabaseConnection
+from lib.database_connection import DatabaseConnection
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
