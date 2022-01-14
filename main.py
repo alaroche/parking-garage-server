@@ -6,51 +6,34 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['*'],
 )
 
-# TODO: double to single quotes
-# TODO: document the end points
-# and add them to the README
-@app.get("/parking_spots")
-def read_item():
-    parking_spots_sql = """
-    SELECT 
-        parking_spots.id, 
-        parking_row_id, 
-        parking_levels.name as "level_name"
-    FROM parking_spots
-    LEFT JOIN parking_rows ON parking_spots.parking_row_id=parking_rows.id
-    LEFT JOIN parking_levels ON parking_rows.level_id=parking_levels.id
-    """
-
-    return DatabaseConnection.run(parking_spots_sql)
-
-@app.get("/availability")
+@app.get('/availability')
 def read_item():
     output = {}
-    num_of_total_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_spots")[0]['COUNT(*)']
-    num_of_filled_spots = DatabaseConnection.run("SELECT COUNT(*) FROM parking_sessions WHERE stopped_at IS NULL")[0]['COUNT(*)']
+    num_of_total_spots = DatabaseConnection.run('SELECT COUNT(*) FROM parking_spots')[0]['COUNT(*)']
+    num_of_filled_spots = DatabaseConnection.run('SELECT COUNT(*) FROM parking_sessions WHERE stopped_at IS NULL')[0]['COUNT(*)']
     num_of_free_spots = num_of_total_spots - num_of_filled_spots
 
-    output["total_spots_free"] = num_of_free_spots
-    output["total_spots"] = num_of_total_spots
-    output["parking_levels"] = {}
+    output['total_spots_free'] = num_of_free_spots
+    output['total_spots'] = num_of_total_spots
+    output['parking_levels'] = {}
 
-    parking_levels = DatabaseConnection.run("SELECT * FROM parking_levels")
+    parking_levels = DatabaseConnection.run('SELECT * FROM parking_levels')
 
     for idx, parking_level in enumerate(parking_levels):
-        total_spots_on_level_sql = """
+        total_spots_on_level_sql = '''
         SELECT COUNT(*) FROM parking_spots
         INNER JOIN parking_rows
         ON parking_spots.parking_row_id = parking_rows.id
         INNER JOIN parking_levels
         ON parking_rows.parking_level_id = parking_levels.id
         WHERE parking_level_id = {level_id}
-        """.format(level_id = parking_level["id"])
-        num_of_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]["COUNT(*)"]
+        '''.format(level_id = parking_level['id'])
+        num_of_spots_on_level = DatabaseConnection.run(total_spots_on_level_sql)[0]['COUNT(*)']
 
-        num_of_filled_spots_on_level_sql = """
+        num_of_filled_spots_on_level_sql = '''
         SELECT COUNT(*) from parking_spots
         INNER JOIN parking_rows
         ON parking_spots.parking_row_id = parking_rows.id
@@ -60,48 +43,47 @@ def read_item():
         ON parking_sessions.parking_spot_id = parking_spots.id
         WHERE parking_sessions.stopped_at IS NULL
         AND parking_level_id = {level_id}
-        """.format(level_id = parking_level['id'])
-        num_of_spots_filled_on_level = DatabaseConnection.run(num_of_filled_spots_on_level_sql)[0]["COUNT(*)"]
+        '''.format(level_id = parking_level['id'])
+        num_of_spots_filled_on_level = DatabaseConnection.run(num_of_filled_spots_on_level_sql)[0]['COUNT(*)']
         num_of_spots_free_on_level = num_of_spots_on_level - num_of_spots_filled_on_level
 
-        output["parking_levels"][idx] = {}
-        output["parking_levels"][idx]["name"] = parking_level["name"]
-        output["parking_levels"][idx]["spots_free"] = num_of_spots_free_on_level
-        output["parking_levels"][idx]["total_spots"] = num_of_spots_on_level
+        output['parking_levels'][idx] = {}
+        output['parking_levels'][idx]['name'] = parking_level['name']
+        output['parking_levels'][idx]['spots_free'] = num_of_spots_free_on_level
+        output['parking_levels'][idx]['total_spots'] = num_of_spots_on_level
 
     return output
 
-@app.post("/park")
+@app.post('/park')
 def update_item():
     spot_id = find_parking_spot();
 
     if bool(spot_id):
-        vehicle_session_insert = """
+        vehicle_session_insert = '''
         INSERT INTO parking_sessions (parking_spot_id, started_at)
         VALUES({spot_id}, CURRENT_TIMESTAMP)
-        """.format(spot_id = spot_id)
+        '''.format(spot_id = spot_id)
 
         DatabaseConnection.insert(vehicle_session_insert)
     else:
-        raise HTTPException(status_code=403, detail="No parking spots are available.")
+        raise HTTPException(status_code=403, detail='No parking spots are available.')
 
-@app.put("/unpark/{session_id}")
+@app.put('/unpark/{session_id}')
 def unpark_vehicle(session_id: int):
-    close_parking_session = """
+    close_parking_session = '''
     UPDATE parking_sessions
     SET stopped_at = CURRENT_TIMESTAMP
     WHERE id = {id}
-    """.format(id = session_id)
+    '''.format(id = session_id)
 
     DatabaseConnection.insert(close_parking_session);
 
-# TODO: external file
 def find_parking_spot():
-    taken_spots_query = """
+    taken_spots_query = '''
     SELECT parking_spot_id
     FROM parking_sessions
     WHERE stopped_at IS NULL
-    """
+    '''
 
     taken_spots_result = DatabaseConnection.run(taken_spots_query)
 
@@ -109,12 +91,12 @@ def find_parking_spot():
     for obj in taken_spots_result:
         taken_spot_ids.append(obj['parking_spot_id']);
 
-    parking_spots_query = """
+    parking_spots_query = '''
     SELECT id FROM parking_spots
     WHERE id NOT IN {}
     ORDER BY id
     LIMIT 1;
-    """.format(tuple(taken_spot_ids));
+    '''.format(tuple(taken_spot_ids));
 
     free_spot = DatabaseConnection.run(parking_spots_query)
 
