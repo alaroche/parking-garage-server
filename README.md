@@ -17,6 +17,15 @@ CREATE USER 'parking_garage_user'@'localhost' IDENTIFIED BY 'pg_sql123';
 GRANT ALL PRIVILEGES ON parking_garage.* TO 'parking_garage_user'@'localhost';
 ```
 
+### User Access
+* Run setup script to setup the admin user:
+From `parking-garage-server/` directory:
+```
+python3 setup_admin_user.py
+```
+
+Login will be `admin/admin`.
+
 ## Run
 ### Start Server
 From `parking-garage-server/` directory:

@@ -1,14 +1,28 @@
+/*** WARNING !!! 
+THIS WILL ERASE ALL DATA  ***/
+
 DROP DATABASE IF EXISTS parking_garage;
 CREATE DATABASE parking_garage;
 
 USE parking_garage;
+
+-- Users Table --
+
+CREATE TABLE users (
+    id int NOT NULL AUTO_INCREMENT,
+    username varchar(11) NOT NULL,
+    salted_pswd varchar(255) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE(username)
+);
 
 -- Structural --
 
 CREATE TABLE parking_levels (
 	id int NOT NULL AUTO_INCREMENT,
     name varchar(12) NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE(name)
 );
 
 CREATE TABLE parking_rows (

@@ -1,12 +1,22 @@
+import hashlib
+import jwt
 from lib.database_connection import DatabaseConnection
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+
+SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2'
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_credentials=True,
+    allow_headers=['*'],
+    allow_methods=['*'],
+    allow_origins=[
+        'http://aaronhost:3000',
+        'http://localhost:3000'
+    ]
 )
 
 @app.get('/availability')
@@ -53,6 +63,42 @@ def read_item():
         output['parking_levels'][idx]['total_spots'] = num_of_spots_on_level
 
     return output
+
+@app.post('/auth')
+def authenticate_user(username: str, given_pswd: str):
+    try:
+        sql = "SELECT * FROM users WHERE username = '{}'".format(username)
+        res = DatabaseConnection.run(sql)[0]
+    except:
+        return {'isError': True, 'result': 'login_failed'}
+
+    salt = res['salted_pswd'][:64]
+    actual_pswd_encrypted = res['salted_pswd'][64:]
+
+    given_pswd_encrypted = hashlib.pbkdf2_hmac('sha256',
+                                     given_pswd.encode('utf-8'),
+                                     bytearray.fromhex(salt),
+                                     10000)
+
+    if given_pswd_encrypted.hex() == actual_pswd_encrypted:
+        json_web_token = jwt.encode({'username': res['username']}, SECRET_TOKEN, algorithm='HS256')
+
+        return {'isError': False, 'result': json_web_token}
+    else:
+        return {'isError': True, 'result': 'login_failed'}
+
+@app.post('/auth_validate')
+def validate_jwt(request: Request):
+    jwt_from_header = request.headers.get('Authorization').split(' ')[1]
+
+    decoded_jwt = jwt.decode(
+        jwt_from_header,
+        SECRET_TOKEN,
+        algorithms=["HS256"],
+        options={'verify_signature': True}
+    )
+
+    return {'username': decoded_jwt['username']}
 
 @app.post('/park')
 def update_item():
