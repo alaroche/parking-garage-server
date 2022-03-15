@@ -64,13 +64,17 @@ def read_item():
 
     return output
 
+def get_user_from_database(username: str):
+    sql = "SELECT * FROM users WHERE username = '{}'".format(username)
+
+    return DatabaseConnection.run(sql)[0]
+
 @app.post('/auth')
 def authenticate_user(username: str, given_pswd: str):
     try:
-        sql = "SELECT * FROM users WHERE username = '{}'".format(username)
-        res = DatabaseConnection.run(sql)[0]
+        res = get_user_from_database(username)
     except:
-        return {'isError': True, 'result': 'login_failed'}
+        return {'success': False, 'result': 'login_failed'}
 
     salt = res['salted_pswd'][:64]
     actual_pswd_encrypted = res['salted_pswd'][64:]
@@ -83,22 +87,32 @@ def authenticate_user(username: str, given_pswd: str):
     if given_pswd_encrypted.hex() == actual_pswd_encrypted:
         json_web_token = jwt.encode({'username': res['username']}, SECRET_TOKEN, algorithm='HS256')
 
-        return {'isError': False, 'result': json_web_token}
+        return {'success': True, 'result': json_web_token}
     else:
-        return {'isError': True, 'result': 'login_failed'}
+        return {'success': False, 'result': 'login_failed'}
 
 @app.post('/auth_validate')
 def validate_jwt(request: Request):
-    jwt_from_header = request.headers.get('Authorization').split(' ')[1]
+    given_jwt = request.headers.get('Authorization').split(' ')[1]
 
     decoded_jwt = jwt.decode(
-        jwt_from_header,
+        given_jwt,
         SECRET_TOKEN,
         algorithms=["HS256"],
         options={'verify_signature': True}
     )
 
-    return {'username': decoded_jwt['username']}
+    try:
+        res = get_user_from_database(decoded_jwt['username'])
+        username = res['username']
+
+        if (username):
+            return {'success': True, 'result': username} 
+        else:
+            return {'success': False, 'result': 'auth_validation_failed'}
+    except:
+        return {'success': False, 'result': 'auth_validation_failed'}
+
 
 @app.post('/park')
 def update_item():
