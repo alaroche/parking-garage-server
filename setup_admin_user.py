@@ -14,7 +14,7 @@ salted_pswd = salt + key
 print('salted_pswd: ' + salted_pswd.hex())
 
 sql = '''
-INSERT INTO users (username, salted_pswd) VALUES ("{}","{}")
+INSERT INTO users (username, salted_pswd, garage_id) VALUES ("{}","{}",1)
 '''.format(username, salted_pswd.hex())
 
 DatabaseConnection.insert(sql)

@@ -1,28 +1,41 @@
 /*** WARNING !!! 
-THIS WILL ERASE ALL DATA  ***/
+THIS WILL ERASE ALL DATA
+AND SET TO DEFAULT  ***/
 
 DROP DATABASE IF EXISTS parking_garage;
 CREATE DATABASE parking_garage;
 
 USE parking_garage;
 
--- Users Table --
+CREATE TABLE garages (
+    id int NOT NULL AUTO_INCREMENT,
+    name varchar(255),
+    address1 varchar(255),
+    address2 varchar(255),
+    city varchar(35),
+    state char(2),
+    zip char(5),
+    email varchar(255),
+
+    PRIMARY KEY (id)
+);
 
 CREATE TABLE users (
     id int NOT NULL AUTO_INCREMENT,
+    garage_id int NOT NULL,
     username varchar(11) NOT NULL,
     salted_pswd varchar(255) NOT NULL,
+    UNIQUE(username),
     PRIMARY KEY (id),
-    UNIQUE(username)
+    FOREIGN KEY (garage_id) REFERENCES garages(id)
 );
-
--- Structural --
 
 CREATE TABLE parking_levels (
 	id int NOT NULL AUTO_INCREMENT,
+    garage_id int NOT NULL,
     name varchar(12) NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE(name)
+    FOREIGN KEY (garage_id) REFERENCES garages(id)
 );
 
 CREATE TABLE parking_rows (
@@ -49,7 +62,10 @@ CREATE TABLE parking_sessions (
 );
 
 -- INSERT DATA --
-INSERT INTO parking_levels (id,name) VALUES (1,'Level A'),(2,'Level B'),(3,'Level C'),(4,'Level D');
+INSERT INTO garages (id, name, address1, address2, city, state, zip, email)
+VALUES (1,'Cherry Tree Plaza Parking','795 Spruce St',NULL,'Jay','VT','05401',NULL);
+
+INSERT INTO parking_levels (id,garage_id,name) VALUES (1,1,'Level A'),(2,1,'Level B'),(3,1,'Level C'),(4,1,'Level D');
 
 INSERT INTO parking_rows (parking_level_id) VALUES (1),(1),(1),(1),(2),(2),(2),(2),(3),(3),(3),(3),(4),(4),(4),(4);
 
