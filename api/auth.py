@@ -12,7 +12,7 @@ def get_user_from_database(username: str):
 
     return DatabaseConnection.run(sql)[0]
 
-def get_user_from_request(request):
+def get_user_from_request(request: Request):
     auth_header = request.headers.get('Authorization')
 
     if (auth_header):
