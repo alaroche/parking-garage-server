@@ -1,9 +1,9 @@
 from lib.database_connection import DatabaseConnection
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix='/go')
 
-@router.post('/park')
+@router.post('/park', status_code=201)
 def park_vehicle():
     spot_id = find_parking_spot()
 
@@ -15,9 +15,9 @@ def park_vehicle():
 
         DatabaseConnection.insert(vehicle_session_insert)
     else:
-        return {'success': False, 'result': 'no_spots_available'}
+        raise HTTPException(status_code=404)
 
-@router.put('/unpark/{session_id}')
+@router.put('/unpark/{session_id}', status_code=200)
 def unpark_vehicle(session_id: int):
     close_parking_session = '''
     UPDATE parking_sessions

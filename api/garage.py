@@ -6,10 +6,9 @@ SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2
 
 router = APIRouter(prefix='/garage')
 
-@router.get('/{garage_id}/availability')
+@router.get('/{garage_id}/availability', status_code=200)
 def get_availability(garage_id: int):
     output = {}
-    output['success'] = False
     output['parking_levels'] = {}
 
     # Initialize counters
@@ -58,7 +57,6 @@ def get_availability(garage_id: int):
 
     output['total_spots_free'] = total_spots_free_in_garage
     output['total_spots'] = total_spots_free_in_garage + total_spots_filled_in_garage
-    output['success'] = True
 
     return output
 
@@ -77,12 +75,12 @@ def get_profile_info(garage_id: int):
         print(result)
         return { 'success': True, 'result' : result } 
     except:
-        return { 'success': False, 'result' : None } 
+        raise HTTPException(status_code=404)
 
 @router.put('/profile')
 def update_profile_info(
     request: Request,
-    garageName: str,
+    garage_name: str,
     address1: str,
     address2: str,
     city: str,
@@ -92,17 +90,17 @@ def update_profile_info(
 ):
     user = get_user_from_request(request)
     username = user['username']
-    garageId = user['garage_id']
+    garage_id = user['garage_id']
 
     user = DatabaseConnection.run("SELECT id, garage_id FROM users WHERE username = '{}'".format(username))[0]['id']
 
     if (user is None):
-        return {'success': False, 'result': None}
+        raise HTTPException(status_code=404)
 
     update_profile_info = '''
     UPDATE garages
     SET
-    name = '{garageName}',
+    name = '{garage_name}',
     address1 = '{address1}',
     address2 = '{address2}',
     city = '{city}',
@@ -110,16 +108,16 @@ def update_profile_info(
     zip = '{zip}',
     email = '{email}'
     WHERE
-    id = {garageId}
+    id = {garage_id}
     '''.format(
-        garageName=garageName,
+        garage_name=garage_name,
         address1=address1,
         address2=address2,
         city=city,
         state=state,
         zip=zip,
         email=email,
-        garageId=garageId
+        garage_id=garage_id
     )
 
     try: 
@@ -127,4 +125,4 @@ def update_profile_info(
 
         return { 'success': True, 'result': 'saved'}
     except:
-        return { 'success': False, 'result': 'database_error'}
+        raise HTTPException(status_code=500)

@@ -1,6 +1,6 @@
 import hashlib
 import jwt
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 from lib.database_connection import DatabaseConnection
 
 SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2'
@@ -35,8 +35,7 @@ def authenticate_user(username: str, given_pswd: str):
     try:
         res = get_user_from_database(username)
     except:
-        # TODO: include http codes
-        return {'success': False, 'result': 'login_failed'}
+        raise HTTPException(status_code=401)
 
     salt = res['salted_pswd'][:64]
     actual_pswd_encrypted = res['salted_pswd'][64:]
@@ -51,13 +50,13 @@ def authenticate_user(username: str, given_pswd: str):
 
         return {'success': True, 'result': json_web_token}
     else:
-        return {'success': False, 'result': 'login_failed'}
+        raise HTTPException(status_code=401)
 
 @router.post('/authorize')
 def validate_jwt(request: Request):
     user = get_user_from_request(request)
 
     if (user['username']):
-        return {'success': True, 'result': {'username': user['username'], 'garageId': user['garage_id']}}
+        return {'result': {'username': user['username'], 'garage_id': user['garage_id']}}
     else:
-        return {'success': False, 'result': 'auth_validation_failed'}
+        raise HTTPException(status_code=401)
