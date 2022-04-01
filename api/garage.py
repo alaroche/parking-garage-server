@@ -1,6 +1,6 @@
 from lib.database_connection import DatabaseConnection
 from fastapi import APIRouter, HTTPException, Request
-from .auth import get_user_from_request
+from .auth import authorize_with_jwt
 
 SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2'
 
@@ -62,9 +62,6 @@ def get_availability(garage_id: int):
 
 @router.get('/{garage_id}/profile')
 def get_profile_info(garage_id: int):
-    print('get_profile_info')
-    print(garage_id)
-
     try:
         result = DatabaseConnection.run('''
         SELECT *
@@ -88,7 +85,7 @@ def update_profile_info(
     zip: str,
     email: str
 ):
-    user = get_user_from_request(request)
+    user = authorize_with_jwt(request)
     username = user['username']
     garage_id = user['garage_id']
 

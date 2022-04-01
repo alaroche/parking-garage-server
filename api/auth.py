@@ -12,24 +12,6 @@ def get_user_from_database(username: str):
 
     return DatabaseConnection.run(sql)[0]
 
-def get_user_from_request(request: Request):
-    auth_header = request.headers.get('Authorization')
-
-    if (auth_header):
-        given_jwt = auth_header.split(' ')[1]
-        decoded_jwt = jwt.decode(
-            given_jwt,
-            SECRET_TOKEN,
-            algorithms=["HS256"],
-            options={'verify_signature': True}
-        )
-
-        res = get_user_from_database(decoded_jwt['username'])
-
-        return {'username': res['username'], 'garage_id': res['garage_id']}
-    else:
-        return {'username': None, 'garage_id': None}
-
 @router.post('/authenticate')
 def authenticate_user(username: str, given_pswd: str):
     try:
@@ -48,15 +30,30 @@ def authenticate_user(username: str, given_pswd: str):
     if given_pswd_encrypted.hex() == actual_pswd_encrypted:
         json_web_token = jwt.encode({'username': res['username']}, SECRET_TOKEN, algorithm='HS256')
 
-        return {'success': True, 'result': json_web_token}
+        print(json_web_token)
+        return {'result': json_web_token}
     else:
         raise HTTPException(status_code=401)
 
 @router.post('/authorize')
-def validate_jwt(request: Request):
-    user = get_user_from_request(request)
+def authorize_with_jwt(request: Request):
+    auth_header = request.headers.get('Authorization')
 
-    if (user['username']):
-        return {'result': {'username': user['username'], 'garage_id': user['garage_id']}}
+    if (auth_header):
+        print('auth_header')
+        print(auth_header)
+        given_jwt = auth_header.split(' ')[1]
+        decoded_jwt = jwt.decode(
+            given_jwt,
+            SECRET_TOKEN,
+            algorithms=["HS256"],
+            options={'verify_signature': True}
+        )
+
+        res = get_user_from_database(decoded_jwt['username'])
+
+        if (res['username']):
+            print({'username': res['username'], 'garage_id': res['garage_id']})
+            return {'username': res['username'], 'garage_id': res['garage_id']}
     else:
         raise HTTPException(status_code=401)
