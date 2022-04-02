@@ -11,7 +11,7 @@ Works with [Parking Garage Client](https://github.com/alaroche/parking-garage-cl
 ## Setup
 ### MySQL
 * Run setup script in SQL which (re-)creates the database and pre-populates tables with sample data: https://github.com/alaroche/parking-garage-server/blob/main/tools/ParkingGarageSetup.sql.
-* Create a user for interaction with the new database:
+* Create a user for the new database:
 ```
 CREATE USER 'parking_garage_user'@'localhost' IDENTIFIED BY 'pg_sql123';
 GRANT ALL PRIVILEGES ON parking_garage.* TO 'parking_garage_user'@'localhost';
