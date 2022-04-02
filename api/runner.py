@@ -29,17 +29,16 @@ def unpark_vehicle(session_id: int):
 
     DatabaseConnection.insert(close_parking_session)
 
+
 def find_parking_spot():
-    filled_spots_query = '''
+    filled_spots = DatabaseConnection.run('''
     SELECT parking_spot_id
     FROM parking_sessions
     WHERE stopped_at IS NULL
-    '''
+    ''')
 
-    filled_spots_result = DatabaseConnection.run(filled_spots_query)
-
-    filled_spot_ids = [0, 0]
-    for obj in filled_spots_result:
+    filled_spot_ids = []
+    for obj in filled_spots:
         filled_spot_ids.append(obj['parking_spot_id'])
 
     parking_spots_query = '''
