@@ -25,6 +25,7 @@ CREATE TABLE users (
     garage_id int NOT NULL,
     username varchar(11) NOT NULL,
     salted_pswd varchar(255) NOT NULL,
+    signed_in_at timestamp,
     UNIQUE(username),
     PRIMARY KEY (id),
     FOREIGN KEY (garage_id) REFERENCES garages(id)
@@ -56,7 +57,7 @@ CREATE TABLE parking_sessions (
     id int NOT NULL AUTO_INCREMENT,
     parking_spot_id int NOT NULL,
     started_at timestamp NOT NULL,
-    stopped_at timestamp NULL,
+    stopped_at timestamp,
     PRIMARY KEY (id),
     FOREIGN KEY (parking_spot_id) REFERENCES parking_spots(id)
 );
