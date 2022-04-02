@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import jwt
 from fastapi import APIRouter, HTTPException, Request
@@ -23,25 +24,39 @@ def authenticate_user(username: str, given_pswd: str):
     actual_pswd_encrypted = res['salted_pswd'][64:]
 
     given_pswd_encrypted = hashlib.pbkdf2_hmac('sha256',
-                                     given_pswd.encode('utf-8'),
-                                     bytearray.fromhex(salt),
-                                     10000)
+                                               given_pswd.encode('utf-8'),
+                                               bytearray.fromhex(salt),
+                                               10000)
 
     if given_pswd_encrypted.hex() == actual_pswd_encrypted:
-        json_web_token = jwt.encode({'username': res['username']}, SECRET_TOKEN, algorithm='HS256')
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        print(json_web_token)
+        DatabaseConnection.insert('''
+        UPDATE users
+        SET signed_in_at = CAST('{now}' as time)
+        WHERE
+        username = '{username}'
+        '''.format(now=now,username=username))
+
+        json_web_token = jwt.encode(
+            {
+                'username': res['username'],
+                'signed_in_at': now,
+            },
+            SECRET_TOKEN,
+            algorithm='HS256'
+        )
+
         return {'result': json_web_token}
     else:
         raise HTTPException(status_code=401)
+
 
 @router.post('/authorize')
 def authorize_with_jwt(request: Request):
     auth_header = request.headers.get('Authorization')
 
     if (auth_header):
-        print('auth_header')
-        print(auth_header)
         given_jwt = auth_header.split(' ')[1]
         decoded_jwt = jwt.decode(
             given_jwt,
@@ -52,8 +67,7 @@ def authorize_with_jwt(request: Request):
 
         res = get_user_from_database(decoded_jwt['username'])
 
-        if (res['username']):
-            print({'username': res['username'], 'garage_id': res['garage_id']})
+        if (str(decoded_jwt['signed_in_at']) == str(res['signed_in_at'])):
             return {'username': res['username'], 'garage_id': res['garage_id']}
     else:
         raise HTTPException(status_code=401)
