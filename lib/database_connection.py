@@ -3,6 +3,7 @@ from fastapi.exceptions import HTTPException
 
 HTTP_INTERNAL_SERVER_ERROR_CODE = 500
 
+
 class DatabaseConnection:
   def run(query):
     try:
@@ -19,7 +20,7 @@ class DatabaseConnection:
                 res.append(db)
           return res
     except:
-      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE) 
+      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE)
 
   def insert(statement):
     try:
@@ -34,4 +35,4 @@ class DatabaseConnection:
               connection.commit()
               return cursor.lastrowid
     except:
-      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE) 
+      raise HTTPException(status_code=HTTP_INTERNAL_SERVER_ERROR_CODE)

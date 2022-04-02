@@ -6,7 +6,8 @@ SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2
 
 router = APIRouter(prefix='/garage')
 
-@router.get('/{garage_id}/availability', status_code=200)
+
+@router.get('/{garage_id}/availability')
 def get_availability(garage_id: int):
     output = {}
     output['parking_levels'] = {}
@@ -15,10 +16,11 @@ def get_availability(garage_id: int):
     total_spots_free_in_garage = 0
     total_spots_filled_in_garage = 0
 
-    parking_levels = DatabaseConnection.run("SELECT * FROM parking_levels WHERE garage_id = {}".format(garage_id))
+    parking_levels = DatabaseConnection.run(
+        "SELECT * FROM parking_levels WHERE garage_id = {}".format(garage_id))
 
     if (len(parking_levels) == 0):
-        raise HTTPException(status_code=404) 
+        raise HTTPException(status_code=404)
 
     for idx, parking_level in enumerate(parking_levels):
         total_spots_on_level_sql = '''
@@ -56,9 +58,11 @@ def get_availability(garage_id: int):
         output['parking_levels'][idx]['total_spots'] = num_of_spots_on_level
 
     output['total_spots_free'] = total_spots_free_in_garage
-    output['total_spots'] = total_spots_free_in_garage + total_spots_filled_in_garage
+    output['total_spots'] = total_spots_free_in_garage + \
+        total_spots_filled_in_garage
 
     return output
+
 
 @router.get('/{garage_id}/profile')
 def get_profile_info(garage_id: int):
@@ -69,10 +73,10 @@ def get_profile_info(garage_id: int):
         WHERE id = {}
         '''.format(garage_id))[0]
 
-        print(result)
-        return { 'success': True, 'result' : result } 
+        return result
     except:
         raise HTTPException(status_code=404)
+
 
 @router.put('/profile')
 def update_profile_info(
@@ -85,14 +89,11 @@ def update_profile_info(
     zip: str,
     email: str
 ):
-    user = authorize_with_jwt(request)
-    username = user['username']
-    garage_id = user['garage_id']
+    user_from_jwt = authorize_with_jwt(request)
+    username = user_from_jwt['username']
 
-    user = DatabaseConnection.run("SELECT id, garage_id FROM users WHERE username = '{}'".format(username))[0]['id']
-
-    if (user is None):
-        raise HTTPException(status_code=404)
+    garage_id = DatabaseConnection.run(
+        "SELECT garage_id FROM users WHERE username = '{}'".format(username))[0]['garage_id']
 
     update_profile_info = '''
     UPDATE garages
@@ -117,9 +118,4 @@ def update_profile_info(
         garage_id=garage_id
     )
 
-    try: 
-        DatabaseConnection.insert(update_profile_info)
-
-        return { 'success': True, 'result': 'saved'}
-    except:
-        raise HTTPException(status_code=500)
+    DatabaseConnection.insert(update_profile_info)

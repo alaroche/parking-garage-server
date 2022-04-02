@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix='/go')
 
+
 @router.post('/park', status_code=201)
 def park_vehicle():
     spot_id = find_parking_spot()
@@ -15,9 +16,10 @@ def park_vehicle():
 
         DatabaseConnection.insert(vehicle_session_insert)
     else:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail='no_parking_available')
 
-@router.put('/unpark/{session_id}', status_code=200)
+
+@router.put('/unpark/{session_id}')
 def unpark_vehicle(session_id: int):
     close_parking_session = '''
     UPDATE parking_sessions

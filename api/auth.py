@@ -8,10 +8,6 @@ SECRET_TOKEN = '7c3a4e52502438e4f4596861c6040542a8632a688ffef1ea88c85f19626e71b2
 
 router = APIRouter(prefix='/auth')
 
-def get_user_from_database(username: str):
-    sql = "SELECT * FROM users WHERE username = '{}'".format(username)
-
-    return DatabaseConnection.run(sql)[0]
 
 @router.post('/authenticate')
 def authenticate_user(username: str, given_pswd: str):
@@ -71,3 +67,9 @@ def authorize_with_jwt(request: Request):
             return {'username': res['username'], 'garage_id': res['garage_id']}
     else:
         raise HTTPException(status_code=401)
+
+
+def get_user_from_database(username: str):
+    sql = "SELECT * FROM users WHERE username = '{}'".format(username)
+
+    return DatabaseConnection.run(sql)[0]
