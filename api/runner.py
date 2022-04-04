@@ -37,18 +37,19 @@ def find_parking_spot():
     WHERE stopped_at IS NULL
     ''')
 
-    filled_spot_ids = []
+    # Built-in values to satisfy SQL syntax
+    filled_spot_ids_str = '0,'
     for obj in filled_spots:
-        filled_spot_ids.append(obj['parking_spot_id'])
+        if type(obj) != None:
+            id = obj['parking_spot_id']
+            filled_spot_ids_str = filled_spot_ids_str + str(id) + ','
 
-    parking_spots_query = '''
+    free_spot = DatabaseConnection.run('''
     SELECT id FROM parking_spots
-    WHERE id NOT IN {}
+    WHERE id NOT IN ({})
     ORDER BY id
     LIMIT 1;
-    '''.format(tuple(filled_spot_ids))
-
-    free_spot = DatabaseConnection.run(parking_spots_query)
+    '''.format(filled_spot_ids_str[:-1]))
 
     if free_spot:
         return free_spot[0]['id']
