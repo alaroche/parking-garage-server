@@ -11,8 +11,8 @@ def park_vehicle():
     if bool(spot_id):
         vehicle_session_insert = '''
         INSERT INTO parking_sessions (parking_spot_id, started_at)
-        VALUES({spot_id}, CURRENT_TIMESTAMP)
-        '''.format(spot_id=spot_id)
+        VALUES({}, CURRENT_TIMESTAMP)
+        '''.format(spot_id)
 
         DatabaseConnection.insert(vehicle_session_insert)
     else:
@@ -24,8 +24,8 @@ def unpark_vehicle(session_id: int):
     close_parking_session = '''
     UPDATE parking_sessions
     SET stopped_at = CURRENT_TIMESTAMP
-    WHERE id = {id}
-    '''.format(id=session_id)
+    WHERE id = {}
+    '''.format(session_id)
 
     DatabaseConnection.insert(close_parking_session)
 

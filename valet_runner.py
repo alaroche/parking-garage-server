@@ -30,7 +30,7 @@ while True:
         print(nowStr + 'leaving')
         session_id = find_random_session_id()
         if (session_id):
-            requests.put('http://127.0.0.1:8000/go/unpark/{id}'.format(id = session_id))
+            requests.put('http://127.0.0.1:8000/go/unpark/{}'.format(session_id))
     else:
         print(nowStr + 'relaxing')
 
