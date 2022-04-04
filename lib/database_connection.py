@@ -15,6 +15,7 @@ class DatabaseConnection:
       ) as connection:
           res = []
           with connection.cursor(dictionary=True) as cursor:
+              print(query)
               cursor.execute(query)
               for db in cursor:
                 res.append(db)
@@ -31,6 +32,7 @@ class DatabaseConnection:
           database='parking_garage',
       ) as connection:
           with connection.cursor(dictionary=True) as cursor:
+              print(statement)
               cursor.execute(statement)
               connection.commit()
               return cursor.lastrowid
