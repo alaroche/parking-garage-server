@@ -78,7 +78,7 @@ def get_profile_info(garage_id: int):
         raise HTTPException(status_code=404)
 
 
-@router.put('/profile')
+@router.put('/{garage_id}/profile')
 def update_profile_info(
     request: Request,
     garage_name: str,
