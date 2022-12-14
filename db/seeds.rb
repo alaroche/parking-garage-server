@@ -24,7 +24,7 @@ garage = Garage.create(
     row = ParkingRow.create(parking_level: level)
 
     12.times {
-      ParkingSpot.create(parking_row: row)
+      ParkingSpot.create(parking_row: row, parking_level: level, garage: garage)
     }
   }
 end

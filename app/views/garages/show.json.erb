@@ -1,0 +1,11 @@
+{
+  "total_spots_free": "<%= @garage.num_of_spots_free %>",
+  "total_spots": "<%= @garage.num_of_spots_total %>",
+  "parking_levels": {
+    <% @garage.parking_levels do |level| %>
+      "name": "<%= level.name %>",
+      "spots_free": "<%= level.num_of_spots_free %>",
+      "spots_total": "<%= level.num_of_spots_total %>"
+    <% end %>
+  }
+}
