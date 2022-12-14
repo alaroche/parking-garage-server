@@ -1,7 +1,7 @@
 class GaragesController < ActionController::API
 
   def show
-    @garage = Garage.find(1)
+    @garage = Garage.last
 
     render json: @garage.json_template
   end

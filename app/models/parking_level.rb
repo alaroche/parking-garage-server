@@ -1,7 +1,6 @@
 class ParkingLevel < ApplicationRecord
   belongs_to :garage
-  has_many :parking_rows, dependent: :destroy
-  has_many :parking_spots
+  has_many :parking_spots, dependent: :destroy
   has_many :parking_sessions
 
   def num_of_spots_free

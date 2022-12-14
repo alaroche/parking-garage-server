@@ -1,3 +1,3 @@
 class ParkingSession < ApplicationRecord
-  belongs_to :parking_spot, dependent: :destroy
+  belongs_to :parking_spot
 end

@@ -31,13 +31,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_171735) do
     t.index ["garage_id"], name: "index_parking_levels_on_garage_id"
   end
 
-  create_table "parking_rows", force: :cascade do |t|
-    t.integer "parking_level_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["parking_level_id"], name: "index_parking_rows_on_parking_level_id"
-  end
-
   create_table "parking_sessions", force: :cascade do |t|
     t.integer "parking_spot_id", null: false
     t.integer "parking_level_id", null: false
@@ -52,33 +45,26 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_171735) do
   end
 
   create_table "parking_spots", force: :cascade do |t|
-    t.integer "parking_row_id", null: false
     t.integer "parking_level_id", null: false
     t.integer "garage_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["garage_id"], name: "index_parking_spots_on_garage_id"
     t.index ["parking_level_id"], name: "index_parking_spots_on_parking_level_id"
-    t.index ["parking_row_id"], name: "index_parking_spots_on_parking_row_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.integer "garage_id", null: false
     t.string "username", limit: 50, null: false
-    t.string "salted_pswd", null: false
+    t.string "password_digest"
     t.datetime "signed_in_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["garage_id"], name: "index_users_on_garage_id"
   end
 
   add_foreign_key "parking_levels", "garages"
-  add_foreign_key "parking_rows", "parking_levels"
   add_foreign_key "parking_sessions", "garages"
   add_foreign_key "parking_sessions", "parking_levels"
   add_foreign_key "parking_sessions", "parking_spots"
   add_foreign_key "parking_spots", "garages"
   add_foreign_key "parking_spots", "parking_levels"
-  add_foreign_key "parking_spots", "parking_rows"
-  add_foreign_key "users", "garages"
 end
