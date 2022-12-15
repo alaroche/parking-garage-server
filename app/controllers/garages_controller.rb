@@ -1,5 +1,4 @@
 class GaragesController < ActionController::API
-
   def show
     @garage = Garage.last
 

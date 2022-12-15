@@ -1,14 +1,13 @@
 class ParkingLevel < ApplicationRecord
   belongs_to :garage
   has_many :parking_spots, dependent: :destroy
-  has_many :parking_sessions
 
   def num_of_spots_free
     num_of_spots_total - num_of_taken_spots
   end
 
   def num_of_taken_spots
-    parking_sessions.where(stopped_at: nil).count
+    parking_spots.where(taken: true).count
   end
 
   def num_of_spots_total

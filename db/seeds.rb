@@ -15,13 +15,7 @@ garage = Garage.create(
 )
 
 ['A','B','C','D'].each do |letter|
-  print("Creating Level #{letter}...")
-  level = ParkingLevel.create(
-    garage: garage,
-    name: "Level #{letter}"
-  )
-
-  48.times {
-    ParkingSpot.create(parking_level: level, garage: garage)
-  }
+  print("Creating Level #{letter}...\n")
+  level = ParkingLevel.create(garage: garage, name: "Level #{letter}")
+  48.times { ParkingSpot.create(parking_level: level, garage: garage) }
 end
