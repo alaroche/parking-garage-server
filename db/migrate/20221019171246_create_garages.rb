@@ -8,8 +8,6 @@ class CreateGarages < ActiveRecord::Migration[7.0]
       t.string :state, limit: 2
       t.string :zip, limit: 5
       t.string :email
-
-      t.timestamps
     end
   end
 end

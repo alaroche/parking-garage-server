@@ -19,15 +19,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_171658) do
     t.string "state", limit: 2
     t.string "zip", limit: 5
     t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "parking_levels", force: :cascade do |t|
     t.integer "garage_id", null: false
     t.string "name", limit: 12, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["garage_id"], name: "index_parking_levels_on_garage_id"
   end
 
@@ -35,8 +31,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_171658) do
     t.integer "parking_level_id", null: false
     t.integer "garage_id", null: false
     t.boolean "taken", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["garage_id"], name: "index_parking_spots_on_garage_id"
     t.index ["parking_level_id"], name: "index_parking_spots_on_parking_level_id"
   end
