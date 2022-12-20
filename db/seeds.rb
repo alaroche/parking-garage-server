@@ -6,16 +6,23 @@
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
 
-garage = Garage.create(
+obj = {
   name: 'Cherry Tree Plaza Parking',
   address1: '795 Spruce St',
   city: 'Jay',
   state: 'VT',
-  zip: '05401'
-)
+  zip: '05401',
+  parking_levels: [],
+}
 
-['A','B','C','D'].each do |letter|
+['A','B','C','D'].each_with_index do |letter, i|
   print("Creating Level #{letter}...\n")
-  level = ParkingLevel.create(garage: garage, name: "Level #{letter}")
-  48.times { ParkingSpot.create(parking_level: level, garage: garage) }
+  obj[:parking_levels] << {name: "Level #{letter}"}
+  obj[:parking_levels][i]['parking_spots'] = []
+  48.times { |spot_idx| obj[:parking_levels][i]['parking_spots'] << spot_idx }
+end
+
+# write garage to a json file
+File.open("storage/1.json", "w") do |f|
+  f.write obj.to_json
 end

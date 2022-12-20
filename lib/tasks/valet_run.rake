@@ -3,24 +3,35 @@ require 'redis'
 desc 'Simulates parking garage data flow'
 
 def first_free_spot(redis_conn)
-  num_of_spots = JSON.parse(File.read('storage/garage.json'))['parking_spots'].size
+  garage = JSON.parse(File.read('storage/1.json'))
+  free_spot = nil
 
-  binary = Array.new(num_of_spots, 0)
+  garage['parking_levels'].each_with_index do |level, i|
+    num_of_spots = garage['parking_levels'][i]['parking_spots'].size
 
-  taken_spots = redis_conn.keys
-  taken_spots.each_with_index do |spot, i|
-    binary[i] = 1
+    binary = Array.new(num_of_spots, 0)
+
+    taken_spots = redis_conn.keys
+    taken_spots.each_with_index do |spot, i|
+      binary[i] = 1
+    end
+
+    free_spot = binary.find_index(0)
+    free_spot ? break : nil
   end
 
-  binary.find_index(0)
+  free_spot
 end
 
 task :valet => :environment do
   while true do
-    #choice = 'park'
-    choice = ['park','leave','relax'][rand(0..2)]
-
     data = Redis.new
+
+    if data.keys.size < 48
+      choice = 'park'
+    else
+      choice = ['park','leave','relax'][rand(0..2)]
+    end
 
     if choice == 'park'
       print("#{Time.now} - parking\n")

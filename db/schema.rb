@@ -10,31 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_19_171658) do
-  create_table "garages", force: :cascade do |t|
-    t.string "name"
-    t.string "address1"
-    t.string "address2"
-    t.string "city"
-    t.string "state", limit: 2
-    t.string "zip", limit: 5
-    t.string "email"
-  end
-
-  create_table "parking_levels", force: :cascade do |t|
-    t.integer "garage_id", null: false
-    t.string "name", limit: 12, null: false
-    t.index ["garage_id"], name: "index_parking_levels_on_garage_id"
-  end
-
-  create_table "parking_spots", force: :cascade do |t|
-    t.integer "parking_level_id", null: false
-    t.integer "garage_id", null: false
-    t.boolean "taken", default: false, null: false
-    t.index ["garage_id"], name: "index_parking_spots_on_garage_id"
-    t.index ["parking_level_id"], name: "index_parking_spots_on_parking_level_id"
-  end
-
+ActiveRecord::Schema[7.0].define(version: 2022_10_19_171549) do
   create_table "users", force: :cascade do |t|
     t.string "username", limit: 50, null: false
     t.string "password_digest"
@@ -43,7 +19,4 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_171658) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "parking_levels", "garages"
-  add_foreign_key "parking_spots", "garages"
-  add_foreign_key "parking_spots", "parking_levels"
 end
