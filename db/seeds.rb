@@ -15,11 +15,15 @@ obj = {
   parking_levels: [],
 }
 
+spot_idx = 0
 ['A','B','C','D'].each_with_index do |letter, i|
   print("Creating Level #{letter}...\n")
   obj[:parking_levels] << {name: "Level #{letter}"}
   obj[:parking_levels][i]['parking_spots'] = []
-  48.times { |spot_idx| obj[:parking_levels][i]['parking_spots'] << spot_idx }
+  48.times do
+    obj[:parking_levels][i]['parking_spots'] << spot_idx
+    spot_idx += 1
+  end
 end
 
 # write garage to a json file

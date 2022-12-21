@@ -7,26 +7,24 @@ def first_free_spot(redis_conn)
   free_spot = nil
 
   garage['parking_levels'].each_with_index do |level, i|
-    num_of_spots = garage['parking_levels'][i]['parking_spots'].size
+    spots_on_level = garage['parking_levels'][i]['parking_spots']
+    spots_taken = spots_on_level & redis_conn.keys.map { |k| Integer(k) }
 
-    binary = Array.new(num_of_spots, 0)
+    free_spot = (spots_on_level - spots_taken)[0]
 
-    taken_spots = redis_conn.keys
-    taken_spots.each_with_index do |spot, i|
-      binary[i] = 1
+    if free_spot
+      print("Checking level #{i}")
+      return free_spot
+    elsif garage['parking_levels'].size === i + 1
+      nil
     end
-
-    free_spot = binary.find_index(0)
-    free_spot ? break : nil
   end
-
-  free_spot
 end
 
 task :valet => :environment do
-  while true do
-    data = Redis.new
+  data = Redis.new
 
+  while true do
     if data.keys.size < 48
       choice = 'park'
     else
@@ -37,7 +35,11 @@ task :valet => :environment do
       print("#{Time.now} - parking\n")
       free_spot = first_free_spot(data)
 
-      !!free_spot ? data.set(first_free_spot(data), Time.now) : print('Lot full')
+      if !!free_spot
+        data.set(free_spot, Time.now)
+      else
+        print('Lot full')
+      end
     elsif choice == 'leave'
       print("#{Time.now} - leaving\n")
       unless data.keys.empty?
