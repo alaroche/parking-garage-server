@@ -1,20 +1,17 @@
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
 
-obj = {
+garage_params = {
   name: 'Cherry Tree Plaza Parking',
   address1: '795 Spruce St',
   city: 'Jay',
   state: 'VT',
   zip: '05401',
-  parking_levels: [],
 }
 
+garage = Garage.create(garage_params)
+
+obj = {garage_id: garage.id, parking_levels: []}
 spot_idx = 0
 ['A','B','C','D'].each_with_index do |letter, i|
   print("Creating Level #{letter}...\n")
@@ -27,6 +24,6 @@ spot_idx = 0
 end
 
 # write garage to a json file
-File.open("storage/1.json", "w") do |f|
+File.open("storage/#{garage.id}.json", "w") do |f|
   f.write obj.to_json
 end

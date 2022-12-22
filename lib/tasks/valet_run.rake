@@ -13,7 +13,7 @@ def first_free_spot(redis_conn)
     free_spot = (spots_on_level - spots_taken)[0]
 
     if free_spot
-      print("Checking level #{i}")
+      print("Checking level #{i}\n")
       return free_spot
     elsif garage['parking_levels'].size === i + 1
       nil
@@ -38,7 +38,7 @@ task :valet => :environment do
       if !!free_spot
         data.set(free_spot, Time.now)
       else
-        print('Lot full')
+        print('Lot full\n')
       end
     elsif choice == 'leave'
       print("#{Time.now} - leaving\n")

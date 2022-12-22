@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_19_171549) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_22_184403) do
+  create_table "garages", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "address1"
+    t.string "address2"
+    t.string "city"
+    t.string "state"
+    t.string "zip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username", limit: 50, null: false
     t.string "password_digest"
