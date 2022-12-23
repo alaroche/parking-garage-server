@@ -4,9 +4,12 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
 
-  root "application#show"
+  root "garages#show"
+  get '/garages/:id', to: 'garages#show'
+  get '/garages/:id/profile', to: 'garages#profile'
+  put '/garages/:id/update', to: 'garages#update'
 
-  get '/login', to: 'sessions#login'
+  post '/auth', to: 'sessions#create'
   post '/login', to: 'sessions#create'
   post '/logout', to: 'sessions#destroy'
   get '/logout', to: 'sessions#destroy'

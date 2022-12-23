@@ -7,6 +7,7 @@ class CreateGarages < ActiveRecord::Migration[7.0]
       t.string :city
       t.string :state
       t.string :zip
+      t.string :email
 
       t.timestamps
     end
