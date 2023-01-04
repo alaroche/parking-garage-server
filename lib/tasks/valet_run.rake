@@ -2,22 +2,13 @@ require 'redis'
 
 desc 'Simulates parking garage data flow'
 
-def first_free_spot(redis_conn)
-  garage = JSON.parse(File.read('storage/1.json'))
+def first_free_spot(garage)
   free_spot = nil
 
-  garage['parking_levels'].each_with_index do |level, i|
-    spots_on_level = garage['parking_levels'][i]['parking_spots']
-    spots_taken = spots_on_level & redis_conn.keys.map { |k| Integer(k) }
+  garage.file['parking_levels'].each_with_index do |level, i|
+    free_spot = garage.free_spots_on_level(i)[0] # TODO: Use level instead of index?
 
-    free_spot = (spots_on_level - spots_taken)[0]
-
-    if free_spot
-      print("Checking level #{i}\n")
-      return free_spot
-    elsif garage['parking_levels'].size === i + 1
-      nil
-    end
+    free_spot ? return free_spot : nil
   end
 end
 
@@ -25,18 +16,22 @@ task :valet => :environment do
   data = Redis.new
 
   while true do
-    if data.keys.size < 48
+    rand_id = Garage.pluck(:id).sample
+    @garage = Garage.find(rand_id)
+
+    if @garage.spots_taken.size < 48
       choice = 'park'
     else
-      choice = ['park','leave','relax'][rand(0..2)]
+      choice = ['park','leave'][rand(0..2)]
     end
 
     if choice == 'park'
       print("#{Time.now} - parking\n")
-      free_spot = first_free_spot(data)
+      free_spot = first_free_spot(data, @garage)
 
       if !!free_spot
-        data.set(free_spot, Time.now)
+        print(free_spot)
+        data.set(free_spot.to_json, Time.now)
       else
         print('Lot full\n')
       end
@@ -46,8 +41,6 @@ task :valet => :environment do
         session = data.keys[rand(0..data.keys.length-1)]
         session ? data.del(session) : nil
       end
-    else
-      print("#{Time.now} - relaxing\n")
     end
 
     sleep(2)

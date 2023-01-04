@@ -1,28 +1,29 @@
 class Garage < ApplicationRecord
   has_and_belongs_to_many :users
 
-  def live_data
-    json = JSON.parse(File.read("storage/#{id}.json"))
+  def file
+    @file ||= JSON.parse(File.read("storage/#{id}.json"))
+  end
 
-    obj = Garage.first.attributes
-    obj['total_spots'] = 0
-    obj['total_spots_free'] = 0
-    obj['parking_levels'] = []
+  def redis_conn
+    @redis_conn ||= Redis.new
+  end
 
-    redis_conn = Redis.new
-    json['parking_levels'].each_with_index do |level,i|
-      obj['parking_levels'][i] = {}
-      spots_on_level = json['parking_levels'][i]['parking_spots']
+  def spots_on_level(level_id)
+    file['parking_levels'][level_id]['parking_spots']
+  end
 
-      obj['parking_levels'][i]['name'] = level['name']
-      obj['parking_levels'][i]['spots_free'] = redis_conn.keys.any? ? (spots_on_level - redis_conn.keys.map { |k| Integer(k) }).size : 0
-      obj['parking_levels'][i]['total_spots'] = spots_on_level.size
+  def spots_taken
+    redis_conn.keys.map { |k| JSON.parse(k) }
+      .select { |k| k['garage_id'] == id }
+      .map { |k| k['spot']}
+  end
 
-      # Aggregate garage-level attributes
-      obj['total_spots'] += obj['parking_levels'][i]['total_spots']
-      obj['total_spots_free'] += obj['parking_levels'][i]['spots_free']
-    end
+  def free_spots_on_level(level_id)
+    spots_on_level(level_id) - spots_taken
+  end
 
-    obj
+  def spots_free_on_level(level_id)
+    redis_conn.keys.any? ? (spots_on_level(level_id) - redis_conn.keys.map { |k| k['spot'] }).size : 0
   end
 end
