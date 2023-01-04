@@ -1,4 +1,20 @@
 class GaragesController < ActionController::API
+  def index
+    # TODO: Scope to a signed in user.
+    garage_info = []
+    Garage.all.each do |garage|
+      obj = {}
+      obj['id'] = garage.id
+      obj['name'] = garage.name
+      obj['total_spots'] = garage.num_of_total_spots
+      obj['total_spots_free'] = garage.num_of_spots_free
+
+      garage_info << obj
+    end
+
+    render json: garage_info
+  end
+
   def show
     @garage = Garage.find(params[:id] || 1)
 
@@ -18,8 +34,6 @@ class GaragesController < ActionController::API
       obj['total_spots'] += obj['parking_levels'][i]['total_spots']
       obj['total_spots_free'] += obj['parking_levels'][i]['spots_free']
     end
-
-    obj
 
     render json: obj
   end

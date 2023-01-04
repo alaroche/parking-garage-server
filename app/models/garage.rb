@@ -9,6 +9,20 @@ class Garage < ApplicationRecord
     @redis_conn ||= Redis.new
   end
 
+  def num_of_total_spots
+    @total_spots ||= 0
+
+    file['parking_levels'].each_with_index do |level, i|
+      @total_spots += file['parking_levels'][i]['parking_spots'].size
+    end
+
+    @total_spots
+  end
+
+  def num_of_spots_free
+    num_of_total_spots - spots_taken.size
+  end
+
   def spots_on_level(level_id)
     file['parking_levels'][level_id]['parking_spots']
   end
