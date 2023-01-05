@@ -19,7 +19,7 @@ class GaragesController < ActionController::API
     @garage = Garage.find(params[:id] || 1)
 
     obj = {}
-    obj['place'] = @garage.json['place']
+    obj['place'] = @garage.attributes
     obj['parking_levels'] = []
 
     @garage.json['parking_levels'].each_with_index do |level,i|

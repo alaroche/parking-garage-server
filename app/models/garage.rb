@@ -6,10 +6,6 @@ class Garage < ApplicationRecord
     @json ||= JSON.parse(self.file)
   end
 
-  def attributes
-    json['place']
-  end
-
   def redis_conn
     @redis_conn ||= Redis.new
   end

@@ -12,6 +12,12 @@
 
 ActiveRecord::Schema[7.0].define(version: 2022_12_22_184403) do
   create_table "garages", force: :cascade do |t|
+    t.string "name"
+    t.string "address1", null: false
+    t.string "address2"
+    t.string "city", null: false
+    t.string "state", null: false
+    t.string "zip", null: false
     t.text "file"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
