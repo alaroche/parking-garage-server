@@ -1,8 +1,13 @@
 class Garage < ApplicationRecord
   has_and_belongs_to_many :users
 
-  def file
-    @file ||= JSON.parse(File.read("storage/#{id}.json"))
+  # TODO: Check this for veracity
+  def json
+    @json ||= JSON.parse(self.file)
+  end
+
+  def attributes
+    json['place']
   end
 
   def redis_conn
@@ -10,21 +15,15 @@ class Garage < ApplicationRecord
   end
 
   def num_of_total_spots
-    @total_spots ||= 0
+    json['parking_levels'].sum { |level| level['parking_spots'].size }
+  end
 
-    file['parking_levels'].each_with_index do |level, i|
-      @total_spots += file['parking_levels'][i]['parking_spots'].size
-    end
-
-    @total_spots
+  def spots_on_level(level_id)
+    json['parking_levels'][level_id]['parking_spots']
   end
 
   def num_of_spots_free
     num_of_total_spots - spots_taken.size
-  end
-
-  def spots_on_level(level_id)
-    file['parking_levels'][level_id]['parking_spots']
   end
 
   def spots_taken

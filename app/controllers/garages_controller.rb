@@ -5,9 +5,9 @@ class GaragesController < ActionController::API
     Garage.all.each do |garage|
       obj = {}
       obj['id'] = garage.id
-      obj['name'] = garage.name
+      obj['place'] = garage.attributes
       obj['total_spots'] = garage.num_of_total_spots
-      obj['total_spots_free'] = garage.num_of_spots_free
+      obj['spots_free'] = garage.num_of_spots_free
 
       garage_info << obj
     end
@@ -18,22 +18,20 @@ class GaragesController < ActionController::API
   def show
     @garage = Garage.find(params[:id] || 1)
 
-    obj = @garage.attributes
-    obj['total_spots'] = 0
-    obj['total_spots_free'] = 0
+    obj = {}
+    obj['place'] = @garage.json['place']
     obj['parking_levels'] = []
 
-    @garage.file['parking_levels'].each_with_index do |level,i|
+    @garage.json['parking_levels'].each_with_index do |level,i|
       obj['parking_levels'][i] = {}
 
       obj['parking_levels'][i]['name'] = level['name']
       obj['parking_levels'][i]['spots_free'] = @garage.free_spots_on_level(i).size
       obj['parking_levels'][i]['total_spots'] = @garage.spots_on_level(i).size
-
-      # Aggregate garage-level attributes
-      obj['total_spots'] += obj['parking_levels'][i]['total_spots']
-      obj['total_spots_free'] += obj['parking_levels'][i]['spots_free']
     end
+
+    obj['total_spots'] = @garage.num_of_total_spots
+    obj['total_spots_free'] = @garage.num_of_spots_free
 
     render json: obj
   end
