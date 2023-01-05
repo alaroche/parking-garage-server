@@ -8,7 +8,7 @@ def first_free_spot(garage)
   garage.file['parking_levels'].each_with_index do |level, i|
     free_spot = garage.free_spots_on_level(i)[0] # TODO: Use level instead of index?
 
-    free_spot ? return free_spot : nil
+    free_spot ? free_spot : nil # TODO: Does return properly?
   end
 end
 

@@ -4,7 +4,7 @@ require 'faker'
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
 5.times do
-  garage_params = {
+  garage_address = {
     name: Faker::Address.community,
     address1: Faker::Address.street_address,
     city: Faker::Address.city,
@@ -12,23 +12,23 @@ require 'faker'
     zip: Faker::Address.zip,
   }
 
-  garage = Garage.create(garage_params)
-  print("Creating #{garage.name}")
-
-  obj = {garage_id: garage.id, parking_levels: []}
+  print("Creating #{garage_address[:name]}")
+  obj = {place: garage_address, parking_levels: []}
   spot_idx = 0
+  spots_per_level = [24,36,48][rand(0..2)]
   ['A','B','C','D','E'][0..rand(1..4)].each_with_index do |letter, i|
     print("Creating Level #{letter}...\n")
     obj[:parking_levels] << {name: "Level #{letter}"}
     obj[:parking_levels][i]['parking_spots'] = []
-    [24,36,48][rand(0..2)].times do
+    spots_per_level.times do
       obj[:parking_levels][i]['parking_spots'] << spot_idx
       spot_idx += 1
     end
   end
 
   # write garage to a json file
-  File.open("storage/#{garage.id}.json", "w") do |f|
-    f.write obj.to_json
-  end
+  Garage.create(file: obj.to_json)
 end
+
+# For test purposes only.
+User.create!(username: 'admin', password: 'admin')
