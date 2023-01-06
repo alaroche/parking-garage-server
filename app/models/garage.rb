@@ -24,7 +24,7 @@ class Garage < ApplicationRecord
 
   def spots_taken
     redis_conn.keys.map { |k| JSON.parse(k) }
-      .select { |k| k['garage_id'] == id }
+      .select { |k| k['garage_id'].to_i == id }
       .map { |k| k['spot']}
   end
 

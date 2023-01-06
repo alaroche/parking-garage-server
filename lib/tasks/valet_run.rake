@@ -5,10 +5,10 @@ desc 'Simulates parking garage data flow'
 def first_free_spot(garage)
   free_spot = nil
 
-  garage.file['parking_levels'].each_with_index do |level, i|
+  garage.json['parking_levels'].each_with_index do |level, i|
     free_spot = garage.free_spots_on_level(i)[0] # TODO: Use level instead of index?
 
-    free_spot ? free_spot : nil # TODO: Does return properly?
+    return free_spot if free_spot
   end
 end
 
@@ -27,11 +27,11 @@ task :valet => :environment do
 
     if choice == 'park'
       print("#{Time.now} - parking\n")
-      free_spot = first_free_spot(data, @garage)
+      free_spot = first_free_spot(@garage)
 
       if !!free_spot
         print(free_spot)
-        data.set(free_spot.to_json, Time.now)
+        data.set({garage_id: @garage.id, spot: free_spot}.to_json, Time.now)
       else
         print('Lot full\n')
       end
