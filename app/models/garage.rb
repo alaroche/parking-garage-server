@@ -1,7 +1,6 @@
 class Garage < ApplicationRecord
   has_and_belongs_to_many :users
 
-  # TODO: Check this for veracity
   def json
     @json ||= JSON.parse(self.file)
   end
@@ -30,9 +29,5 @@ class Garage < ApplicationRecord
 
   def free_spots_on_level(level_id)
     spots_on_level(level_id) - spots_taken
-  end
-
-  def spots_free_on_level(level_id)
-    redis_conn.keys.any? ? (spots_on_level(level_id) - redis_conn.keys.map { |k| k['spot'] }).size : 0
   end
 end

@@ -43,6 +43,6 @@ task :valet => :environment do
       end
     end
 
-    sleep(2)
+    sleep(1)
   end
 end
