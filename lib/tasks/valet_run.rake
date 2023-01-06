@@ -26,19 +26,18 @@ task :valet => :environment do
     end
 
     if choice == 'park'
-      print("#{Time.now} - parking\n")
       free_spot = first_free_spot(@garage)
 
       if !!free_spot
-        print(free_spot)
+        print("#{Time.now} - #{@garage.name} parking in spot ##{free_spot}\n")
         data.set({garage_id: @garage.id, spot: free_spot}.to_json, Time.now)
       else
-        print('Lot full\n')
+        print("#{Time.now} - #{@garage.name} lot full.\n")
       end
     elsif choice == 'leave'
-      print("#{Time.now} - leaving\n")
       unless data.keys.empty?
         session = data.keys[rand(0..data.keys.length-1)]
+        print("#{Time.now} - #{@garage.name} leaving spot.\n")
         session ? data.del(session) : nil
       end
     end
