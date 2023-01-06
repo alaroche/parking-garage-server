@@ -8,8 +8,8 @@ Rails.application.routes.draw do
 
   get '/garages', to: 'garages#index'
   get '/garages/:id', to: 'garages#show'
-  get '/users/:id/profile', to: 'users#edit'
-  put '/users/:id/update', to: 'users#update'
+  get '/users/profile', to: 'users#edit'
+  put '/users/update', to: 'users#update'
 
   post '/auth', to: 'sessions#create'
   post '/login', to: 'sessions#create'

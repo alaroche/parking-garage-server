@@ -1,4 +1,6 @@
-class GaragesController < ActionController::API
+class GaragesController < ApplicationController
+  before_action :authenticate_user, only: [:index]
+
   def index
     # TODO: Scope to a signed in user.
     garage_info = []
