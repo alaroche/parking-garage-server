@@ -187,6 +187,7 @@ DEPENDENCIES
   debug
   faker!
   jwt (~> 2.6.0)
+  mail (= 2.8.0)
   puma (= 6.0.1)
   rack-cors (~> 1.1.1)
   rails (~> 7.0.4)

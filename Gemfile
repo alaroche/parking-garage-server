@@ -43,6 +43,7 @@ gem "faker", :git => "https://github.com/faker-ruby/faker.git", :branch => "main
 
 # Satisfy AWS requirements
 gem "date", "~> 3.1.3"
+gem "mail", "= 2.8.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
