@@ -2,7 +2,12 @@ class ApplicationController < ActionController::API
   before_action :validate_header, only: [:user_from_request]
 
   USER_SESSION_TTL = 7.days
+  HTTP_OK = 200
   HTTP_UNAUTHORIZED = 401
+
+  def index
+    render json: {status: HTTP_OK}
+  end
 
   def decoded_jwt_from_request
     jwt = request.headers['Authorization'].split(' ').last
