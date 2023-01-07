@@ -178,9 +178,9 @@ DEPENDENCIES
   bootsnap
   debug
   faker!
-  jwt
+  jwt (~> 2.6.0)
   puma (~> 5.0)
-  rack-cors
+  rack-cors (~> 1.1.1)
   rails (~> 7.0.4)
   redis (~> 4.0)
   sqlite3 (~> 1.4)
