@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.0.5"
+ruby "3.0.5", patchlevel: "211"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4"
@@ -41,9 +41,10 @@ gem "jwt", "~> 2.6.0"
 # For needed seed data
 gem "faker", :git => "https://github.com/faker-ruby/faker.git", :branch => "main"
 
-# Satisfy AWS requirements
+# AWS deploy needs
+gem "mail", "= 2.7.1"
 gem "date", "~> 3.1.3"
-gem "mail", "= 2.8.0"
+gem "bundler", "~> 2.4.1"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
